@@ -78,6 +78,8 @@ void ThreadPool::addTask(const Task& task)
   else
   {
     MutexLockGuard lock(mutex_);
+    
+	/* 如果任务队列满,则睡眠等待 */
     while (isFull())
     {
       notFull_.wait();
@@ -110,6 +112,8 @@ ThreadPool::Task ThreadPool::take()
   {
     task = queue_.front();
     queue_.pop_front();
+    
+	/* 取出任务后就唤醒因任务队列满而等待添加任务的线程 */
     if (maxQueueSize_ > 0)
     {
       notFull_.notify();
@@ -136,13 +140,17 @@ void ThreadPool::runInThread()
     {
       threadInitCallback_();
     }
-    while (running_)
+	
+	while(true)    
+	//while (running_)
     {
       Task task(take());
       if (task)
       {
         task();
       }
+	  if(!running_ && queue_.empty() )
+		break;
     }
   }
 /*
