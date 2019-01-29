@@ -3,8 +3,8 @@ A Server Instant Messaging System
 
 
 ## ThreadPool 
-    ### * Interface Of  ThreadPool * 
-    ```
+#### **Interface Of  ThreadPool**  
+```
     /* 设置任务队列大小 */
     void setMaxQueueSize(int maxSize);
     
@@ -22,9 +22,10 @@ A Server Instant Messaging System
     
     /* 返回任务队列中任务个数 */
     size_t queueSize();
-    ```
-    ### * Example *
-    ```
+```
+#### **Example**
+
+```
 #include <iostream>
 #include "../include/Thread.h"
 #include "../include/ThreadPool.h"
@@ -76,9 +77,7 @@ int main(void)
     /* 线程池停止 */
     tp.stop();
 
-    sleep(1);
     return 0;
 }
 
-    ```
-
+```
