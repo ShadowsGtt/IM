@@ -13,14 +13,7 @@
 #include <assert.h>
 #endif
 
-/*
-
-#ifdef MUDUO_STD_STRING
-using std::string;
-#else  // !MUDUO_STD_STRING
-typedef __gnu_cxx::__sso_string string;
-#endif
-*/
+using namespace std;
 
 template<typename To, typename From>
 inline To implicit_cast(From const &f)

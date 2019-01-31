@@ -34,9 +34,15 @@ public:
 
   // default copy/assignment are Okay
 
+  /* 返回网络端(大端)IP */
   uint32_t ipNetEndian() const;
+  
+  /* 返回网络端(大端)端口 */
   uint16_t portNetEndian() const { return addr_.sin_port; }
-  const struct sockaddr* getSockAddr() const { return sockets::sockaddr_cast(&addr_); }
+  
+const struct sockaddr* getSockAddr() const { return sockets::sockaddr_cast(&addr_); }
+
+   void setSockAddrInet(const struct sockaddr_in& addr) { addr_ = addr; }
 
 
  private:

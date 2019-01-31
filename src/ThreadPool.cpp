@@ -1,6 +1,6 @@
 #include "../include/ThreadPool.h"
 
-//#include <muduo/base/Exception.h>
+#include "../include/Exception.h"
 
 #include <boost/bind.hpp>
 #include <assert.h>
@@ -153,7 +153,6 @@ void ThreadPool::runInThread()
 		break;
     }
   }
-/*
   catch (const Exception& ex)
   {
     fprintf(stderr, "exception caught in ThreadPool %s\n", name_.c_str());
@@ -161,7 +160,6 @@ void ThreadPool::runInThread()
     fprintf(stderr, "stack trace: %s\n", ex.stackTrace());
     abort();
   }
-*/
   catch (const std::exception& ex)
   {
     fprintf(stderr, "exception caught in ThreadPool %s\n", name_.c_str());

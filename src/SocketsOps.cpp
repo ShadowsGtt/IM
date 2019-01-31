@@ -14,8 +14,6 @@
 #include <sys/uio.h>  // readv
 #include <unistd.h>
 
-//using namespace muduo;
-//using namespace muduo::net;
 using namespace net;
 
 namespace
@@ -23,27 +21,29 @@ namespace
 
 typedef struct sockaddr SA;
 
-
-//#if VALGRIND || defined (NO_ACCEPT4)
+/*
+* 设置sockfd为非阻塞,并设置FD_CLOEXEC
+* 设置FD_CLOEXEC ：当程序执行exec时会关闭原本进程中打开的fd
+* 如果不设置FD_CLOEXEC，fd会在程序执行exec后仍保持打开
+* 
+*/
 void setNonBlockAndCloseOnExec(int sockfd)
 {
-  // non-block
+
   int flags = ::fcntl(sockfd, F_GETFL, 0);
   flags |= O_NONBLOCK;
   int ret = ::fcntl(sockfd, F_SETFL, flags);
-  // FIXME check
 
-  // close-on-exec
   flags = ::fcntl(sockfd, F_GETFD, 0);
   flags |= FD_CLOEXEC;
   ret = ::fcntl(sockfd, F_SETFD, flags);
-  // FIXME check
+
 
   (void)ret;
 }
-//#endif
 
-}
+
+} // end of namespace
 
 const struct sockaddr* sockets::sockaddr_cast(const struct sockaddr_in6* addr)
 {
@@ -54,6 +54,13 @@ struct sockaddr* sockets::sockaddr_cast(struct sockaddr_in6* addr)
 {
   return static_cast<struct sockaddr*>(implicit_cast<void*>(addr));
 }
+
+/* 新添加 */
+struct sockaddr* sockets::sockaddr_cast(struct sockaddr_in* addr)
+{
+  return static_cast<struct sockaddr*>(implicit_cast<void*>(addr));
+}
+
 
 const struct sockaddr* sockets::sockaddr_cast(const struct sockaddr_in* addr)
 {
@@ -70,24 +77,18 @@ const struct sockaddr_in6* sockets::sockaddr_in6_cast(const struct sockaddr* add
   return static_cast<const struct sockaddr_in6*>(implicit_cast<const void*>(addr));
 }
 
+
+
 int sockets::createNonblockingOrDie(sa_family_t family)
 {
-#if VALGRIND
   int sockfd = ::socket(family, SOCK_STREAM, IPPROTO_TCP);
   if (sockfd < 0)
   {
     //LOG_SYSFATAL << "sockets::createNonblockingOrDie";
   }
-
   setNonBlockAndCloseOnExec(sockfd);
-#else
-  int sockfd = ::socket(family, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
-  if (sockfd < 0)
-  {
-    //LOG_SYSFATAL << "sockets::createNonblockingOrDie";
-  }
-#endif
-  return sockfd;
+  
+return sockfd;
 }
 
 void sockets::bindOrDie(int sockfd, const struct sockaddr* addr)
@@ -108,16 +109,12 @@ void sockets::listenOrDie(int sockfd)
   }
 }
 
-int sockets::accept(int sockfd, struct sockaddr_in6* addr)
+int sockets::accept(int sockfd, struct sockaddr_in* addr)
 {
   socklen_t addrlen = static_cast<socklen_t>(sizeof *addr);
-//#if VALGRIND || defined (NO_ACCEPT4)
   int connfd = ::accept(sockfd, sockaddr_cast(addr), &addrlen);
   setNonBlockAndCloseOnExec(connfd);
-//#else
-  //int connfd = ::accept4(sockfd, sockaddr_cast(addr),
-                         //&addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);
-//#endif
+
   if (connfd < 0)
   {
     int savedErrno = errno;
@@ -151,7 +148,47 @@ int sockets::accept(int sockfd, struct sockaddr_in6* addr)
   }
   return connfd;
 }
+/*
+int sockets::accept(int sockfd, struct sockaddr_in6* addr)
+{
+  socklen_t addrlen = static_cast<socklen_t>(sizeof *addr);
+  int connfd = ::accept(sockfd, sockaddr_cast(addr), &addrlen);
+  setNonBlockAndCloseOnExec(connfd);
 
+  if (connfd < 0)
+  {
+    int savedErrno = errno;
+    //LOG_SYSERR << "Socket::accept";
+    switch (savedErrno)
+    {
+      case EAGAIN:
+      case ECONNABORTED:
+      case EINTR:
+      case EPROTO: // ???
+      case EPERM:
+      case EMFILE: // per-process lmit of open file desctiptor ???
+        // expected errors
+        errno = savedErrno;
+        break;
+      case EBADF:
+      case EFAULT:
+      case EINVAL:
+      case ENFILE:
+      case ENOBUFS:
+      case ENOMEM:
+      case ENOTSOCK:
+      case EOPNOTSUPP:
+        // unexpected errors
+        //LOG_FATAL << "unexpected error of ::accept " << savedErrno;
+        break;
+      default:
+        //LOG_FATAL << "unknown error of ::accept " << savedErrno;
+        break;
+    }
+  }
+  return connfd;
+}
+*/
 int sockets::connect(int sockfd, const struct sockaddr* addr)
 {
   return ::connect(sockfd, addr, static_cast<socklen_t>(sizeof(struct sockaddr_in6)));
@@ -199,8 +236,9 @@ void sockets::toIpPort(char* buf, size_t size,
   snprintf(buf+end, size-end, ":%u", port);
 }
 
-void sockets::toIp(char* buf, size_t size,
-                   const struct sockaddr* addr)
+
+
+void sockets::toIp(char* buf, size_t size, const struct sockaddr* addr)
 {
   if (addr->sa_family == AF_INET)
   {
@@ -208,16 +246,10 @@ void sockets::toIp(char* buf, size_t size,
     const struct sockaddr_in* addr4 = sockaddr_in_cast(addr);
     ::inet_ntop(AF_INET, &addr4->sin_addr, buf, static_cast<socklen_t>(size));
   }
-  else if (addr->sa_family == AF_INET6)
-  {
-    assert(size >= INET6_ADDRSTRLEN);
-    const struct sockaddr_in6* addr6 = sockaddr_in6_cast(addr);
-    ::inet_ntop(AF_INET6, &addr6->sin6_addr, buf, static_cast<socklen_t>(size));
-  }
 }
 
-void sockets::fromIpPort(const char* ip, uint16_t port,
-                         struct sockaddr_in* addr)
+
+void sockets::fromIpPort(const char* ip, uint16_t port, struct sockaddr_in* addr)
 {
   addr->sin_family = AF_INET;
   addr->sin_port = htobe16(port);//hostToNetwork16(port);
@@ -227,16 +259,6 @@ void sockets::fromIpPort(const char* ip, uint16_t port,
   }
 }
 
-void sockets::fromIpPort(const char* ip, uint16_t port,
-                         struct sockaddr_in6* addr)
-{
-  addr->sin6_family = AF_INET6;
-  addr->sin6_port = htobe16(port);//hostToNetwork16(port);
-  if (::inet_pton(AF_INET6, ip, &addr->sin6_addr) <= 0)
-  {
-    //LOG_SYSERR << "sockets::fromIpPort";
-  }
-}
 
 int sockets::getSocketError(int sockfd)
 {
