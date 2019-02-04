@@ -27,6 +27,7 @@ namespace CurrentThread
   BOOST_STATIC_ASSERT(sameType);
 }
 
+
 namespace detail
 {
 
@@ -126,7 +127,7 @@ void* startThread(void* obj)
   return NULL;
 }
 
-}
+}   // end namespace detail
 
 
 

@@ -2,7 +2,7 @@
 #ifndef _THREAD_H
 #define _THREAD_H
 
-//#include <muduo/base/Atomic.h>
+//#include "../include/Atomic.h"
 #include "../include/CountDownLatch.h"
 #include "../include/Types.h"
 

@@ -1,17 +1,10 @@
-#ifndef MUDUO_BASE_TYPES_H
-#define MUDUO_BASE_TYPES_H
+#ifndef _TYPES_H
+#define _TYPES_H
 
 #include <stdint.h>
-#ifdef MUDUO_STD_STRING
 #include <string>
-#else  // !MUDUO_STD_STRING
-#include <ext/vstring.h>
-#include <ext/vstring_fwd.h>
-#endif
-
-#ifndef NDEBUG
 #include <assert.h>
-#endif
+
 
 using namespace std;
 
@@ -30,9 +23,6 @@ inline To down_cast(From* f)                     // so we only accept pointers
     implicit_cast<From*, To>(0);
   }
 
-#if !defined(NDEBUG) && !defined(GOOGLE_PROTOBUF_NO_RTTI)
-  assert(f == NULL || dynamic_cast<To>(f) != NULL);  // RTTI: debug mode only!
-#endif
   return static_cast<To>(f);
 }
 
