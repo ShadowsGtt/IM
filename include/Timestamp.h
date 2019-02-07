@@ -22,10 +22,7 @@ class Timestamp : public boost::equality_comparable<Timestamp>,
   ///
   /// Constucts an invalid Timestamp.
   ///
-  Timestamp()
-    : microSecondsSinceEpoch_(0)
-  {
-  }
+  Timestamp() : microSecondsSinceEpoch_(0) {}
 
   ///
   /// Constucts a Timestamp at specific time
@@ -33,8 +30,7 @@ class Timestamp : public boost::equality_comparable<Timestamp>,
   /// @param microSecondsSinceEpoch
   explicit Timestamp(int64_t microSecondsSinceEpochArg)
     : microSecondsSinceEpoch_(microSecondsSinceEpochArg)
-  {
-  }
+  {}
 
   void swap(Timestamp& that)
   {
@@ -57,6 +53,7 @@ class Timestamp : public boost::equality_comparable<Timestamp>,
   /// Get time of now.
   ///
   static Timestamp now();
+
   static Timestamp invalid()
   {
     return Timestamp();
@@ -67,15 +64,16 @@ class Timestamp : public boost::equality_comparable<Timestamp>,
     return fromUnixTime(t, 0);
   }
 
+  /*  */
   static Timestamp fromUnixTime(time_t t, int microseconds)
   {
     return Timestamp(static_cast<int64_t>(t) * kMicroSecondsPerSecond + microseconds);
   }
 
-  static const int kMicroSecondsPerSecond = 1000 * 1000;
+  static const int kMicroSecondsPerSecond = 1000 * 1000; //表示每秒所对应的微秒数
 
  private:
-  int64_t microSecondsSinceEpoch_;
+  int64_t microSecondsSinceEpoch_;    //1970-01-01 00:00:00 UTC  到现在的 微秒数   
 };  //end class 
 
 
