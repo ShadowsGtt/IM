@@ -2,14 +2,7 @@
 
 #include <sys/time.h>
 #include <stdio.h>
-
 #include <inttypes.h>
-
-//#include <boost/static_assert.hpp>
-
-
-//BOOST_STATIC_ASSERT(sizeof(Timestamp) == sizeof(int64_t));
-
 
 
 string Timestamp::toString() const
