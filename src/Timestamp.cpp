@@ -5,10 +5,10 @@
 
 #include <inttypes.h>
 
-#include <boost/static_assert.hpp>
+//#include <boost/static_assert.hpp>
 
 
-BOOST_STATIC_ASSERT(sizeof(Timestamp) == sizeof(int64_t));
+//BOOST_STATIC_ASSERT(sizeof(Timestamp) == sizeof(int64_t));
 
 
 
@@ -17,7 +17,7 @@ string Timestamp::toString() const
   char buf[32] = {0};
   int64_t seconds = microSecondsSinceEpoch_ / kMicroSecondsPerSecond;
   int64_t microseconds = microSecondsSinceEpoch_ % kMicroSecondsPerSecond;
-  snprintf(buf, sizeof(buf)-1, "%" PRId64 ".%06" PRId64 "", seconds, microseconds);
+  snprintf(buf, sizeof(buf)-1, "%ld"  ".%06ld"  , seconds, microseconds);
   return buf;
 }
 

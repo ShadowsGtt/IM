@@ -59,6 +59,7 @@ class Date
   ///
   string toIsoString() const;
 
+  /* 将儒略日转换成年月日 */
   struct YearMonthDay yearMonthDay() const;
 
   int year() const
@@ -85,8 +86,10 @@ class Date
   int julianDayNumber() const { return julianDayNumber_; }
 
  private:
-  int julianDayNumber_;
+  int julianDayNumber_;   //儒略日
 };   // end class Date
+
+
 
 
 inline bool operator<(Date x, Date y)

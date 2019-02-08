@@ -2,7 +2,6 @@
 #define _TIMESTAMP_H
 
 
-#include "../include/Types.h"
 #include <string>
 #include <boost/operators.hpp>
 
@@ -64,7 +63,6 @@ class Timestamp : public boost::equality_comparable<Timestamp>,
     return fromUnixTime(t, 0);
   }
 
-  /*  */
   static Timestamp fromUnixTime(time_t t, int microseconds)
   {
     return Timestamp(static_cast<int64_t>(t) * kMicroSecondsPerSecond + microseconds);
@@ -88,13 +86,10 @@ inline bool operator==(Timestamp lhs, Timestamp rhs)
   return lhs.microSecondsSinceEpoch() == rhs.microSecondsSinceEpoch();
 }
 
-///
-/// Gets time difference of two timestamps, result in seconds.
-///
-/// @param high, low
-/// @return (high-low) in seconds
-/// @c double has 52-bit precision, enough for one-microsecond
-/// resolution for next 100 years.
+
+
+
+/* 返回两个时间差秒数 */
 inline double timeDifference(Timestamp high, Timestamp low)
 {
   int64_t diff = high.microSecondsSinceEpoch() - low.microSecondsSinceEpoch();
@@ -108,6 +103,7 @@ inline double timeDifference(Timestamp high, Timestamp low)
 ///
 inline Timestamp addTime(Timestamp timestamp, double seconds)
 {
+  /* 计算微秒数 */
   int64_t delta = static_cast<int64_t>(seconds * Timestamp::kMicroSecondsPerSecond);
   return Timestamp(timestamp.microSecondsSinceEpoch() + delta);
 }
