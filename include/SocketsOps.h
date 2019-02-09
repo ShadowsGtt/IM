@@ -50,9 +50,11 @@ const struct sockaddr_in* sockaddr_in_cast(const struct sockaddr* addr);
 const struct sockaddr_in6* sockaddr_in6_cast(const struct sockaddr* addr);
 
 /* 从 sockfd 中得到本端信息 */
-struct sockaddr_in6 getLocalAddr(int sockfd);
+struct sockaddr_in getLocalAddr(int sockfd);
+
 /* 从 sockfd 中得到对端信息 */
-struct sockaddr_in6 getPeerAddr(int sockfd);
+struct sockaddr_in getPeerAddr(int sockfd);
+
 
 //bool isSelfConnect(int sockfd);
 

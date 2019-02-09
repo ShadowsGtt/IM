@@ -1,6 +1,54 @@
 # IM 服务器介绍
 A Server Instant Messaging System
 
+
+## SocketsOps [SocketsOps.cpp SocketsOps.h]  
+#### 描述  
+```
+	将socket系统调用封装在namespace sockets中
+```
+#### 接口  
+```
+	/* 创建指定地址族的sockfd, AF_INET or AF_INET6*/
+	int createNonblockingOrDie(sa_family_t family);
+
+	/* 连接 成功返回0 失败-1 */
+	int  connect(int sockfd, const struct sockaddr* addr);
+	
+	/* 绑定  */
+  	void bindOrDie(int sockfd, const struct sockaddr* addr);
+	
+	/* 监听 */	
+	void listenOrDie(int sockfd);
+	
+	/* 接受新连接，返回新 socketfd */
+	int  accept(int sockfd, struct sockaddr_in* addr);
+	
+	/* 原生读 */
+	ssize_t read(int sockfd, void *buf, size_t count);
+	
+	/* 原生分散读 */
+	ssize_t readv(int sockfd, const struct iovec *iov, int iovcnt);
+	
+	/* 原生写 */
+	ssize_t write(int sockfd, const void *buf, size_t count);
+	
+	/* 关闭socketfd */
+	void close(int sockfd);
+	
+	/* 关闭写端 */	
+	void shutdownWrite(int sockfd);
+	
+
+	/* 从 sockfd 中得到本端信息 */
+	struct sockaddr_in getLocalAddr(int sockfd);
+
+	/* 从 sockfd 中得到对端信息 */
+	struct sockaddr_in getPeerAddr(int sockfd);
+```
+
+
+
 ## InetAddress [InetAddress.cpp InetAddress.h]  
 #### 描述  
 ```
