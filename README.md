@@ -154,6 +154,7 @@ A Server Instant Messaging System
 #### 接口  
 ```
 	/* 新建一个线程类 参数1:设置回调函数  参数2:线程名字 */
+	/* 为传入name时会使用默认名字 Thread1 Thread2... */
 	Thread(const boost::function<void ()>&, const string& name = string());
 	
 	/* 线程开始运行 */
@@ -167,6 +168,10 @@ A Server Instant Messaging System
 	
 	/* 返回线程名字 */
 	const Thread::string& name();
+
+    /* 返回线程序列号 */
+	const int32_t sequence();
+
 ```
 
 
@@ -202,7 +207,7 @@ A Server Instant Messaging System
 	/* 析构时解锁mutex */
 	~MutexLockGuard();
 	
-```  
+```
 
 
 
@@ -234,6 +239,138 @@ A Server Instant Messaging System
     /* 返回任务队列中任务个数 */
     size_t queueSize();
 ```
+
+## Timestamp  [Timestamp.h  Timestamp.cpp]
+#### 描述  
+```
+	时间戳的封装
+```
+#### **接口**  
+```
+	/* 构造一个微秒数为0的无效类 */
+  	Timestamp();
+
+  	/* 构造一个微秒数为microSecondsSinceEpochArg的Timestamp */
+  	explicit Timestamp(int64_t microSecondsSinceEpochArg);
+
+  	/* this->microSecondsSinceEpoch_ 与 that.microSecondsSinceEpoch_互换 */
+  	void swap(Timestamp& that);
+
+  	/* 将microSecondsSinceEpoch_转换成 [秒.微秒]格式的 string */
+  	string toString() const;
+
+  	/* 转换成   xxxx-xx-xx xx:xx:xx.xxxxxx 格式的string */
+  	string toFormattedString(bool showMicroseconds = true) const;
+
+  	/* 判断是否有效 microSecondsSinceEpoch_值大于0则有效*/
+  	bool valid() ;
+
+  	/* 得到私有变量microSecondsSinceEpoch_值 */
+  	int64_t microSecondsSinceEpoch();
+  
+  	/* 将microSecondsSinceEpoch_值转换成秒数并返回 */
+  	time_t secondsSinceEpoch();
+  	
+	/* 得到系统当前时间并存成微秒数 返回一个新Timestamp */
+  	static Timestamp now();
+
+  	/* 返回一个微秒数为0的无效类 */
+  	static Timestamp invalid();
+
+  	/* Unix时间戳经历的秒数记录为微秒数，返回Timestamp类 */
+  	static Timestamp fromUnixTime(time_t t);
+  
+	/* Unix时间戳经历的秒数及微秒数记录为微秒数，返回Timestamp类 */
+  	static Timestamp fromUnixTime(time_t t, int microseconds);
+
+	//下面这两个时全局函数  作为辅助函数
+	/* 返回两个时间差秒数 high - low */
+	inline double timeDifference(Timestamp high, Timestamp low);
+
+	/* 计算 timestamp + 秒数seconds  ，返回新Timestamp类 */
+	inline Timestamp addTime(Timestamp timestamp, double seconds);
+
+```
+## Timer  [Timer.h  Timer.cpp]
+#### 描述  
+```
+	定时器的实现
+```
+#### **接口**  
+```
+	/* 构造函数，传入定时器到时的回调，到时的时间点 */
+	/* interval为时间间隔，表示定时器多长时间调用一次回调 */
+	/* 一般要么设置when  要么设置interval */
+	Timer(const TimerCallback& cb, Timestamp when, double interval);
+	
+	/* 运行回调 */
+  	void run();
+
+	/* 返回定时器的截止时间 */
+  	Timestamp expiration();
+ 
+	/* 是否设置以一定的时间间隔重复激活的定时器 */
+  	bool repeat();
+  
+  	/* 返回定时器的序列号 */
+  	int64_t sequence();
+
+  	/* 重启定时器  用于设置repeat的Timer */
+  	void restart(Timestamp now);
+
+```
+
+
+## Condition  [Condition.h  Condition.cpp]
+#### 描述  
+```
+	条件变量的封装
+```
+#### **接口**  
+```
+	/* 构造函数，传入一个互斥锁 */ 
+ 	/*因为条件变量总是与互斥锁搭配使用 */
+	Condition(MutexLock& mutex)
+	
+	/* 睡眠等待条件变量 */
+	void wait();
+
+	/* 唤醒等待条件变量的一个线程 */
+  	void notify();
+
+	/* 唤醒等待条件变量的全部线程 */
+ 	void notifyAll();
+
+	/* 睡眠等待条件变量senconds秒 */
+	/* 超时返回true  */	
+	bool waitForSeconds(double seconds);
+
+```
+
+
+
+## CountDownLatch  [CountDownLatch.h  CountDownLatch.cpp]
+#### 描述  
+```
+	一个辅助类,用于同步多个线程	
+```
+#### **接口**  
+```
+	/* 构造函数，设置门闩值  */ 
+	CountDownLatch(int count);
+	
+	/* 睡眠等待，直到count值为0时才开始运行*/
+	void wait();
+
+	/* 将count值减1 */
+  	void countDown();
+
+	/* 返回count值 */
+ 	int getCount() const;
+
+
+```
+
 
 
 

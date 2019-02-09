@@ -11,6 +11,7 @@
 //#include <boost/shared_ptr.hpp>
 #include <pthread.h>
 #include <string>
+#include <atomic>
 #include "./Timestamp.h"
 
 using namespace std;
@@ -25,18 +26,31 @@ class Thread : boost::noncopyable
   explicit Thread(const ThreadFunc&, const string& name = string()); 
   ~Thread();
 
+  /* 线程开始运行 */
   void start();
-  int join(); // return pthread_join()
 
+  /* 等待线程运行结束 */
+  int join(); 
+
+  /* 是否正在运行 */
   bool started() const { return started_; }
-  // pthread_t pthreadId() const { return pthreadId_; }
+
+  /* 返回线程id */
   pid_t tid() const { return tid_; }
+  
+  /* 返回线程名字 */
   const string& name() const { return name_; }
 
-  //static int numCreated() { return numCreated_.get(); }
+  /* 返回线程序列号 */
+  const int32_t sequence() { return sequence_; }
 
+  
  private:
-  //void setDefaultName();
+  /* 返回numCreated值 */
+  static int numCreated() { return numCreated_; }
+
+  /* 设置线程的默认名字  Thread1 Thread2 ... */
+  void setDefaultName();
 
   bool       started_;
   bool       joined_;
@@ -46,7 +60,10 @@ class Thread : boost::noncopyable
   string     name_;
   CountDownLatch latch_;
 
-  //static AtomicInt32 numCreated_;
+  /* 线程序列号 递增的 */
+  int sequence_;
+
+  static std::atomic<int32_t> numCreated_;
 };
 
 #endif

@@ -24,6 +24,7 @@ class Timer : boost::noncopyable
       sequence_(++s_numCreated_)
   { }
 
+  /* 运行回调 */
   void run() const
   {
     callback_();

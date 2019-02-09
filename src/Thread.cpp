@@ -1,8 +1,8 @@
 
 #include "../include/Thread.h"
 #include "../include/CurrentThread.h"
-//#include <muduo/base/Exception.h>
-//#include <muduo/base/Logging.h>
+#include "../include/Exception.h"
+//#include "../include/Logging.h"
 
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -75,6 +75,8 @@ struct ThreadData
       latch_(latch)
   { }
 
+
+/* 线程最终运行的函数 */
   void runInThread()
   {
     *tid_ = CurrentThread::tid();
@@ -84,9 +86,7 @@ struct ThreadData
 
     CurrentThread::t_threadName = name_.empty() ? "Thread" : name_.c_str();
     ::prctl(PR_SET_NAME, CurrentThread::t_threadName);
-    func_();
-    //CurrentThread::t_threadName = "finished";
-    /*
+    CurrentThread::t_threadName = "finished";
        try
        {
        func_();
@@ -94,7 +94,7 @@ struct ThreadData
        }
        catch (const Exception& ex)
        {
-       muduo::CurrentThread::t_threadName = "crashed";
+       CurrentThread::t_threadName = "crashed";
        fprintf(stderr, "exception caught in Thread %s\n", name_.c_str());
        fprintf(stderr, "reason: %s\n", ex.what());
        fprintf(stderr, "stack trace: %s\n", ex.stackTrace());
@@ -102,18 +102,17 @@ struct ThreadData
        }
        catch (const std::exception& ex)
        {
-       muduo::CurrentThread::t_threadName = "crashed";
+       CurrentThread::t_threadName = "crashed";
        fprintf(stderr, "exception caught in Thread %s\n", name_.c_str());
        fprintf(stderr, "reason: %s\n", ex.what());
        abort();
        }
        catch (...)
        {
-       muduo::CurrentThread::t_threadName = "crashed";
+       CurrentThread::t_threadName = "crashed";
        fprintf(stderr, "unknown exception caught in Thread %s\n", name_.c_str());
        throw; // rethrow
        }
-       */
   }
 };
 
@@ -154,6 +153,17 @@ void CurrentThread::sleepUsec(int64_t usec)
   ::nanosleep(&ts, NULL);
 }
 
+
+
+
+// 下面是Thread类相关
+
+
+std::atomic<int32_t> Thread::numCreated_;
+
+
+
+
 Thread::Thread(const ThreadFunc& func, const string& n)
   : started_(false),
     joined_(false),
@@ -161,7 +171,11 @@ Thread::Thread(const ThreadFunc& func, const string& n)
     tid_(0),
     func_(func),
     name_(n),
-    latch_(1){}
+    latch_(1),
+    sequence_(++numCreated_)
+{
+  setDefaultName();
+}
 
 
 Thread::~Thread()
@@ -172,10 +186,11 @@ Thread::~Thread()
   }
 }
 
-/*
+
+
 void Thread::setDefaultName()
 {
-  int num = numCreated_.incrementAndGet();
+  int num = sequence_;
   if (name_.empty())
   {
     char buf[32];
@@ -183,7 +198,6 @@ void Thread::setDefaultName()
     name_ = buf;
   }
 }
-*/
 
 void Thread::start()
 {
