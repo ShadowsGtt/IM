@@ -21,18 +21,27 @@ namespace sockets
 class InetAddress
 {
 public:
+
+  /* 构造函数  传入ip 和 port */	
   InetAddress(string ip, uint16_t port);
 
-  /// Constructs an endpoint with given struct @c sockaddr_in
-  /// Mostly used when accepting new connections
-  explicit InetAddress(const struct sockaddr_in& addr) : addr_(addr)
-  { }
+  /* 构造函数  传入struct sockaddr_in结构体 */
+  explicit InetAddress(const struct sockaddr_in& addr) : addr_(addr){}
+
+  /* 返回地址族 用到的都是IPV4 AF_INET */
   sa_family_t family() const { return addr_.sin_family; }
+
+  /* 以string形式返回IP地址  */
+  /* eg: 0.0.0.0 */
   string toIp() const;
+
+  /* 以string形式返回IP 及 port */
+  /* eg: 0.0.0.0:8888 */
   string toIpPort() const;
+
+  /* 返回port */
   uint16_t toPort() const;
 
-  // default copy/assignment are Okay
 
   /* 返回网络端(大端)IP */
   uint32_t ipNetEndian() const;
@@ -40,8 +49,10 @@ public:
   /* 返回网络端(大端)端口 */
   uint16_t portNetEndian() const { return addr_.sin_port; }
   
-const struct sockaddr* getSockAddr() const { return sockets::sockaddr_cast(&addr_); }
+  /* 以struct sockaddr形式返回地址 */
+  const struct sockaddr* getSockAddr() const { return sockets::sockaddr_cast(&addr_); }
 
+   /* 设置sockaddr_in地址 */
    void setSockAddrInet(const struct sockaddr_in& addr) { addr_ = addr; }
 
 
