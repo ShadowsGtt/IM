@@ -18,8 +18,11 @@ serv : $(serv_obj)
 	$(CC) -c $^ $(CFLAG) $(IDIR)  -o $@
 
 
+CLR = $(wildcard ./src/*.o)
+CLR_EXEC = $(wildcard ./serv)
+
 .PHONY:clean
 clean:
-	rm ./src/*.o 
-	rm ./serv 
+	$(if $(CLR) $(shell rm ./src/*.o ),) 
+	$(if $(CLR_EXEC) $(shell rm ./serv ),)
 

@@ -2,11 +2,18 @@
 #define _TYPES_H
 
 #include <stdint.h>
+#include <cstring>
 #include <string>
 #include <assert.h>
 
 
 using namespace std;
+
+
+inline void memZero(void* p, size_t n)
+{
+  memset(p, 0, n);
+}
 
 template<typename To, typename From>
 inline To implicit_cast(From const &f)
