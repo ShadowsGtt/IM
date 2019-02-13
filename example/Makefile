@@ -2,7 +2,7 @@ CC := g++
 LIBDIR := -L/usr/libmysql
 LIB := -lpthread -lmysqlclient
 IDIR := -I/usr/include/mysql
-CFLAG := -std=c++11
+CFLAG := -std=c++11 -g
 
 SRC = $(wildcard  ../src/*.cpp)
 
@@ -13,7 +13,10 @@ ALLSRC += $(wildcard ./*main.cpp)
 ALLOBJ = $(patsubst %.cpp,%.o,$(ALLSRC) )
 
 .PHONY : all
-all : ThreadPool MutexLock Timestamp Thread Logging
+all : ThreadPool MutexLock Timestamp Thread Logging LogFile
+
+LogFile : $(filter ./%eg.LogFile.main.o ../src/%.o   , $(ALLOBJ) )
+	$(CC) $^ $(LIBDIR) -o $@ $(LIB) 
 
 Thread : $(filter ./%eg.Thread.main.o ../src/%.o   , $(ALLOBJ) )
 	$(CC) $^ $(LIBDIR) -o $@ $(LIB) 

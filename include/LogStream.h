@@ -154,14 +154,6 @@ class LogStream : boost::noncopyable
     return *this;
   }
 
-/*
-  self& operator<<(const StringPiece& v)
-  {
-    buffer_.append(v.data(), v.size());
-    return *this;
-  }
-*/
-
   self& operator<<(const Buffer& v)
   {
     //*this << v.toStringPiece();

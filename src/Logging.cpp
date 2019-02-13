@@ -121,8 +121,6 @@ Logger::Impl::Impl(LogLevel level, int savedErrno, const SourceFile& file, int l
   //formatTime();
 
   /* 将时间写入一条日志消息 */
-
-
   stream_ << T(time_.toFormattedString().c_str(),24 ) << T(" ",1);
   CurrentThread::tid();
    
@@ -231,7 +229,7 @@ Logger::~Logger()
   /* 得到缓冲区的引用 */
   const LogStream::Buffer& buf(stream().buffer());
   
-  /* 将一行日志内容输出到指定的输出 */
+  /* 将缓冲区的日志内容输出到指定的输出 */
   g_output(buf.data(), buf.length());	
   
   if (impl_.level_ == FATAL)

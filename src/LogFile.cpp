@@ -83,10 +83,12 @@ void LogFile::append_unlocked(const char* logline, int len)
       count_ = 0;
       time_t now = ::time(NULL);
       time_t thisPeriod_ = now / kRollPerSeconds_ * kRollPerSeconds_;
+	/* 判断是否到了新的一天 */
       if (thisPeriod_ != startOfPeriod_)
       {
         rollFile();
       }
+	/* 是否到了刷新时间 (默认3秒)  */
       else if (now - lastFlush_ > flushInterval_)
       {
         lastFlush_ = now;
@@ -101,7 +103,10 @@ void LogFile::append_unlocked(const char* logline, int len)
 bool LogFile::rollFile()
 {
   time_t now = 0;
+  /* 生成新文件名字 并将时间存入now中 */
   string filename = getLogFileName(basename_, &now);
+  
+  /* start为now所指的当天的00:00 */
   time_t start = now / kRollPerSeconds_ * kRollPerSeconds_;
 
   if (now > lastRoll_)

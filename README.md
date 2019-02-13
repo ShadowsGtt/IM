@@ -371,7 +371,71 @@ A Server Instant Messaging System
 
 ```
 
+## Logging  [Logging.h  Logging.cpp]
+#### 描述  
+```
+	将日志消息保存到4M的缓冲区內
+```
+#### **接口**  
+``` 
+	LOG_TRACE << [content];  	//需设置日志级别为TRACE才会记录
+	LOG_DEBUG << [content];  	//需设置日志级别为DEBUG或TRACE才会记录
+	LOG_INFO  << [content];		//默认日志级别 
+	LOG_WARN  << [content];		//
+	LOG_ERROR << [content];		//
+	LOG_FATAL << [content];  	//记录日志并Abort()退出程序 
+	LOG_SYSERR << [content]; 	//当errno不为0时会 记录错误信息
+	LOG_SYSFATAL << [content]; 	//记录日志并退出程序 当errno不为0时会记录错误信息
+	
+	/* 获得内部stream_ */
+	/* stream_才是真正持有缓冲区的成员 */
+	/* 通过stream_的const Buffer& buffer()函数获得缓冲区  */ 
+	/*Buffer是 LogStream::Buffer类型 */
+	/*  通过stream_的void resetBuffer()函数清空缓冲区 */
+	LogStream& stream();	
+	
+	/* 获得当前日志级别 */
+	static LogLevel logLevel();
+
+	/* 设置日志级别 */
+	static void setLogLevel(LogLevel level);
+
+	/* 设置日志输出的回调函数 */
+	/* 当LOG_*调用结束后会调用该回调函数 */
+	/* msg指针会指向日志缓冲区的起始位置  缓冲区的长度为len */
+	static void setOutput(void (*OutputFunc)(const char* msg, int len));
+
+	/* 设置日志刷新函数 */
+	static void setFlush(void (*FlushFunc)());
+```
 
 
 
+
+## LogFile  [LogFile.h  LogFile.cpp]
+#### 描述  
+```
+	将日志信息记录到文件中
+	文件名格式:文件名.年月日-十分秒.主机名.进程id.log
+	附：每到新的一天就会创建新文件去记录日志内容,这是不可更改的
+```
+#### **接口**  
+```	
+	/* 构造函数  basename:文件名  rollSize:文件大小达到多色Byte时创建新文件 */
+	/* threadSafe:是否需要加锁写(默认加锁)  flushInterval 每多少秒刷新日志内容到磁盘(默认3秒) */
+	/* 每多少次写操作就检查是否要回滚 */
+	LogFile( const string& basename,   off_t rollSize,
+              bool threadSafe = true, int flushInterval = 3,
+          	  int checkEveryN = 1024 );
+	
+	/* 向文件中追加内容 */
+	void append(const char* logline, int len);
+
+	/* 刷新文件缓冲区内容到磁盘 */
+	void flush();
+
+	/* 回滚  即创建新的日志文件 但是同一秒內不会创建新文件的 */
+	bool rollFile();
+
+```
 

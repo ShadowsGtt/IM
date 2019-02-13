@@ -44,7 +44,7 @@ class LogFile : boost::noncopyable
   /* 每隔flushInterval_秒就将日志内容刷到磁盘 */
   const int flushInterval_;
 
-  /* 每checkEveryN_次写，就滚动一次日志 */
+  /* 每checkEveryN_次写就判断是否需要回滚 */
   const int checkEveryN_;
 
   /* 写入的次数 */

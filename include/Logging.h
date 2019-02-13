@@ -62,9 +62,8 @@ class Logger
   Logger(SourceFile file, int line, bool toAbort);
   ~Logger();
 
+/*====================接口函数============================*/
   LogStream& stream() { return impl_.stream_; }
-
- /*====================接口函数============================*/
   static LogLevel logLevel();
   static void setLogLevel(LogLevel level);
 
@@ -159,4 +158,4 @@ T* CheckNotNull(Logger::SourceFile file, int line, const char *names, T* ptr)
   return ptr;
 }
 
-#endif  // MUDUO_BASE_LOGGING_H
+#endif  // _LOGGING_H
