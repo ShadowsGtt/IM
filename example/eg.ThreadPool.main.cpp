@@ -1,7 +1,7 @@
 #include <iostream>
 #include "../include/Thread.h"
 #include "../include/ThreadPool.h"
-#include <boost/bind.hpp>
+#include <functional>
 
 using namespace std;
 
@@ -30,7 +30,7 @@ int main(void)
     tp.setMaxQueueSize(1024);
 
     /* 设置线程池中的线程启动时运行的初始化函数 */
-    tp.setThreadInitCallback(boost::bind(&initCallBack));
+    tp.setThreadInitCallback(std::bind(&initCallBack));
 
     /* 设置线程池中线程数目并启动线程池 */
     tp.start(5);
@@ -43,7 +43,7 @@ int main(void)
 
     /* 向线程池中添加任务 */
     for ( int i = 0 ;i < 10 ; ++i )
-        tp.addTask(boost::bind(&task,i));
+        tp.addTask(std::bind(&task,i));
 
     /* 线程池停止 */
     tp.stop();

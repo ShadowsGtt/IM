@@ -1,8 +1,6 @@
 #include "../include/ThreadPool.h"
-
 #include "../include/Exception.h"
 
-#include <boost/bind.hpp>
 #include <assert.h>
 #include <stdio.h>
 
@@ -34,9 +32,9 @@ void ThreadPool::start(int numThreads)
   {
     char id[32];
     snprintf(id, sizeof id, "%d", i+1);
-    threads_.push_back(new Thread(
-          boost::bind(&ThreadPool::runInThread, this), name_+id));
-    threads_[i].start();
+	threads_.emplace_back(new Thread(
+          std::bind(&ThreadPool::runInThread, this), name_+id));
+    threads_[i]->start();
   }
   if (numThreads == 0 && threadInitCallback_)
   {
@@ -53,12 +51,13 @@ void ThreadPool::stop()
   running_ = false;
   notEmpty_.notifyAll();
   }
-
   /* 等待线程池中的线程 */
-  for_each(threads_.begin(),
-           threads_.end(),
-           boost::bind(&Thread::join, _1));
+  for (auto& thr : threads_)
+  {
+    thr->join();
+  }
 }
+
 
 /* 获取任务队列任务个数 */
 size_t ThreadPool::queueSize() const

@@ -2,24 +2,22 @@
 #ifndef _THREADPOOL_H
 #define _THREADPOOL_H
 
-#include "../include/Condition.h"
-#include "../include/Mutex.h"
-#include "../include/Thread.h"
-#include "../include/Types.h"
-
-#include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <functional>
-
 #include <deque>
+#include <vector>
+#include <functional>
+#include <memory>
 
-using namespace std;
+#include "./Condition.h"
+#include "./Mutex.h"
+#include "./Thread.h"
+#include "./Types.h"
+#include "./nocopyable.h"
 
-class ThreadPool : boost::noncopyable
+
+class ThreadPool : noncopyable
 {
  public:
-  typedef boost::function<void ()> Task;
+  typedef std::function<void ()> Task;
 
   explicit ThreadPool(const string& nameArg = string("ThreadPool"));
   ~ThreadPool();
@@ -50,7 +48,8 @@ class ThreadPool : boost::noncopyable
   Condition notFull_;    /* 任务队列未满的条件变量 */
   string name_;
   Task threadInitCallback_;  /* 初始化函数，由用户指定，每个线程都会运行 */
-  boost::ptr_vector<Thread> threads_;
+  //boost::ptr_vector<Thread> threads_;
+  std::vector<std::unique_ptr<Thread>> threads_;
   std::deque<Task> queue_;
   size_t maxQueueSize_;
   bool running_;

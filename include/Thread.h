@@ -2,26 +2,25 @@
 #ifndef _THREAD_H
 #define _THREAD_H
 
-//#include "../include/Atomic.h"
-#include "../include/CountDownLatch.h"
-#include "../include/Types.h"
-
-#include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
-//#include <boost/shared_ptr.hpp>
+#include <functional>
 #include <pthread.h>
 #include <string>
 #include <atomic>
+
+#include "./CountDownLatch.h"
+#include "./Types.h"
 #include "./Timestamp.h"
+#include "./nocopyable.h"
 
 using namespace std;
 
 class Timestamp;
 
-class Thread : boost::noncopyable
+
+class Thread : noncopyable 
 {
  public:
-  typedef boost::function<void ()> ThreadFunc;
+  typedef std::function<void ()> ThreadFunc;
 
   explicit Thread(const ThreadFunc&, const string& name = string()); 
   ~Thread();

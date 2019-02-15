@@ -1,19 +1,18 @@
 #ifndef _TIMER_H
 #define _TIMER_H
 
-#include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
-#include "../include/Timestamp.h"
 #include <atomic>
-
+#include <functional>
+#include "../include/Timestamp.h"
+#include "./nocopyable.h"
 
 namespace net
 {
 
-typedef boost::function<void()> TimerCallback;
+typedef std::function<void()> TimerCallback;
 
 
-class Timer : boost::noncopyable
+class Timer : noncopyable
 {
  public:
   Timer(const TimerCallback& cb, Timestamp when, double interval)

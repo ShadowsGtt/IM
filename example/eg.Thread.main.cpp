@@ -1,6 +1,6 @@
 #include <iostream>
 #include "../include/Thread.h"
-#include <boost/bind.hpp>
+#include <functional>
 
 using namespace std;
 
@@ -15,9 +15,9 @@ void initCallBack()
 int main(void)
 {
 
-    Thread td1(boost::bind(initCallBack));
-    Thread td2(boost::bind(initCallBack));
-    Thread td3(boost::bind(initCallBack));
+    Thread td1(std::bind(initCallBack));
+    Thread td2(std::bind(initCallBack));
+    Thread td3(std::bind(initCallBack));
 
 
 

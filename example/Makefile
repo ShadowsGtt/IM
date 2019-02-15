@@ -13,7 +13,10 @@ ALLSRC += $(wildcard ./*main.cpp)
 ALLOBJ = $(patsubst %.cpp,%.o,$(ALLSRC) )
 
 .PHONY : all
-all : ThreadPool MutexLock Timestamp Thread Logging LogFile
+all : ThreadPool MutexLock Timestamp Thread Logging LogFile AsyncLogging
+
+AsyncLogging : $(filter ./%eg.AsyncLogging.main.o ../src/%.o   , $(ALLOBJ) )
+	$(CC) $^ $(LIBDIR) -o $@ $(LIB) 
 
 LogFile : $(filter ./%eg.LogFile.main.o ../src/%.o   , $(ALLOBJ) )
 	$(CC) $^ $(LIBDIR) -o $@ $(LIB) 
