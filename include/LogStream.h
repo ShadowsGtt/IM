@@ -1,12 +1,14 @@
 #ifndef _LOGSTREAM_H
 #define _LOGSTREAM_H
 
-//#include "../include/StringPiece.h"
+
 #include "../include/Types.h"
+#include "./nocopyable.h"
+
 #include <assert.h>
 #include <cstring> // memcpy
 #include <string>
-#include <boost/noncopyable.hpp>
+
 
 
 /* FixedBuffer  是固定大小的缓冲区 用于作为日志系统的缓冲区 */
@@ -17,7 +19,7 @@ const int kSmallBuffer = 4000;
 const int kLargeBuffer = 4000*1000;
 
 template<int SIZE>
-class FixedBuffer : boost::noncopyable
+class FixedBuffer : noncopyable
 {
  public:
   FixedBuffer() : cur_(data_)
@@ -94,7 +96,7 @@ class FixedBuffer : boost::noncopyable
 
 /* LogStream类是重载  >> 的日志流 */
 
-class LogStream : boost::noncopyable
+class LogStream : noncopyable
 {
   typedef LogStream self;
  public:

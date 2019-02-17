@@ -2,13 +2,12 @@
 #ifndef _CONDITION_H
 #define _CONDITION_H
 
-#include "../include/Mutex.h"
-
-#include <boost/noncopyable.hpp>
+#include "./Mutex.h"
+#include "./nocopyable.h"
 #include <pthread.h>
 
 
-class Condition : boost::noncopyable
+class Condition : noncopyable
 {
  public:
   explicit Condition(MutexLock& mutex)

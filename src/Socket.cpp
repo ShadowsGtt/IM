@@ -1,7 +1,7 @@
 
 #include "../include/Socket.h"
 
-//#include "../include/Logging.h"
+#include "../include/Logging.h"
 #include "../include/InetAddress.h"
 #include "../include/SocketsOps.h"
 
@@ -63,13 +63,11 @@ void Socket::listen()
 
 int Socket::accept(InetAddress* peeraddr)
 {
-  //struct sockaddr_in6 addr;
   struct sockaddr_in addr;
   bzero(&addr, sizeof addr);
   int connfd = sockets::accept(sockfd_, &addr);
   if (connfd >= 0)
   {
-    //peeraddr->setSockAddrInet6(addr);
       peeraddr->setSockAddrInet(addr);
   }
   return connfd;
@@ -104,12 +102,12 @@ void Socket::setReusePort(bool on)
                          &optval, static_cast<socklen_t>(sizeof optval));
   if (ret < 0 && on)
   {
-    //LOG_SYSERR << "SO_REUSEPORT failed.";
+    LOG_SYSERR << "SO_REUSEPORT failed.";
   }
 #else
   if (on)
   {
-    //LOG_ERROR << "SO_REUSEPORT is not supported.";
+    LOG_ERROR << "SO_REUSEPORT is not supported.";
   }
 #endif
 }

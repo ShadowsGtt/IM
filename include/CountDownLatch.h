@@ -4,11 +4,10 @@
 
 #include "../include/Condition.h"
 #include "../include/Mutex.h"
+#include "../include/nocopyable.h"
 
-#include <boost/noncopyable.hpp>
 
-
-class CountDownLatch : boost::noncopyable
+class CountDownLatch : noncopyable
 {
  public:
 

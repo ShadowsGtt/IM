@@ -1,17 +1,16 @@
 #ifndef _FILEUTIL_H
 #define _FILEUTIL_H
 
-#include <boost/noncopyable.hpp>
+#include "../include/nocopyable.h"
 #include <sys/types.h>  // for off_t
-#include <string>
+#include "./Types.h"
 
-using std::string;
 
 namespace FileUtil
 {
 
 // read small file < 64KB
-class ReadSmallFile : boost::noncopyable
+class ReadSmallFile : noncopyable
 {
  public:
   ReadSmallFile(string filename);
@@ -53,7 +52,7 @@ int readFile(string filename,
 }
 
 // not thread safe
-class AppendFile : boost::noncopyable
+class AppendFile : noncopyable
 {
  public:
   explicit AppendFile(string filename);

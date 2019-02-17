@@ -3,12 +3,12 @@
 #define _MUTEX_H
 
 #include "../include/CurrentThread.h"
-#include <boost/noncopyable.hpp>
+#include "../include/nocopyable.h"
 #include <assert.h>
 #include <pthread.h>
 
 
-class MutexLock : boost::noncopyable
+class MutexLock : noncopyable
 {
  public:
   MutexLock(): holder_(0)
@@ -71,7 +71,7 @@ class MutexLock : boost::noncopyable
 
 
 
-  class UnassignGuard : boost::noncopyable
+  class UnassignGuard : noncopyable
   {
    public:
     UnassignGuard(MutexLock& owner)
@@ -94,7 +94,7 @@ class MutexLock : boost::noncopyable
 
 
 
-class MutexLockGuard : boost::noncopyable
+class MutexLockGuard : noncopyable
 {
  public:
   explicit MutexLockGuard(MutexLock& mutex)

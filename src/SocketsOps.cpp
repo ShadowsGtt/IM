@@ -1,7 +1,7 @@
 
 #include "../include/SocketsOps.h"
 
-//#include <muduo/base/Logging.h>
+#include "../include/Logging.h"
 #include "../include/Types.h"
 #include "../include/Endian.h"
 
@@ -84,7 +84,7 @@ int sockets::createNonblockingOrDie(sa_family_t family)
   int sockfd = ::socket(family, SOCK_STREAM, IPPROTO_TCP);
   if (sockfd < 0)
   {
-    //LOG_SYSFATAL << "sockets::createNonblockingOrDie";
+    LOG_SYSFATAL << "sockets::createNonblockingOrDie";
   }
   setNonBlockAndCloseOnExec(sockfd);
   
@@ -96,7 +96,7 @@ void sockets::bindOrDie(int sockfd, const struct sockaddr* addr)
   int ret = ::bind(sockfd, addr, static_cast<socklen_t>(sizeof(struct sockaddr_in6)));
   if (ret < 0)
   {
-    //LOG_SYSFATAL << "sockets::bindOrDie";
+    LOG_SYSFATAL << "sockets::bindOrDie";
   }
 }
 
@@ -105,7 +105,7 @@ void sockets::listenOrDie(int sockfd)
   int ret = ::listen(sockfd, SOMAXCONN);
   if (ret < 0)
   {
-    //LOG_SYSFATAL << "sockets::listenOrDie";
+    LOG_SYSFATAL << "sockets::listenOrDie";
   }
 }
 
@@ -118,7 +118,7 @@ int sockets::accept(int sockfd, struct sockaddr_in* addr)
   if (connfd < 0)
   {
     int savedErrno = errno;
-    //LOG_SYSERR << "Socket::accept";
+    LOG_SYSERR << "Socket::accept";
     switch (savedErrno)
     {
       case EAGAIN:
@@ -139,56 +139,16 @@ int sockets::accept(int sockfd, struct sockaddr_in* addr)
       case ENOTSOCK:
       case EOPNOTSUPP:
         // unexpected errors
-        //LOG_FATAL << "unexpected error of ::accept " << savedErrno;
+        LOG_FATAL << "unexpected error of ::accept " << savedErrno;
         break;
       default:
-        //LOG_FATAL << "unknown error of ::accept " << savedErrno;
+        LOG_FATAL << "unknown error of ::accept " << savedErrno;
         break;
     }
   }
   return connfd;
 }
-/*
-int sockets::accept(int sockfd, struct sockaddr_in6* addr)
-{
-  socklen_t addrlen = static_cast<socklen_t>(sizeof *addr);
-  int connfd = ::accept(sockfd, sockaddr_cast(addr), &addrlen);
-  setNonBlockAndCloseOnExec(connfd);
 
-  if (connfd < 0)
-  {
-    int savedErrno = errno;
-    //LOG_SYSERR << "Socket::accept";
-    switch (savedErrno)
-    {
-      case EAGAIN:
-      case ECONNABORTED:
-      case EINTR:
-      case EPROTO: // ???
-      case EPERM:
-      case EMFILE: // per-process lmit of open file desctiptor ???
-        // expected errors
-        errno = savedErrno;
-        break;
-      case EBADF:
-      case EFAULT:
-      case EINVAL:
-      case ENFILE:
-      case ENOBUFS:
-      case ENOMEM:
-      case ENOTSOCK:
-      case EOPNOTSUPP:
-        // unexpected errors
-        //LOG_FATAL << "unexpected error of ::accept " << savedErrno;
-        break;
-      default:
-        //LOG_FATAL << "unknown error of ::accept " << savedErrno;
-        break;
-    }
-  }
-  return connfd;
-}
-*/
 int sockets::connect(int sockfd, const struct sockaddr* addr)
 {
   return ::connect(sockfd, addr, static_cast<socklen_t>(sizeof(struct sockaddr_in6)));
@@ -213,7 +173,7 @@ void sockets::close(int sockfd)
 {
   if (::close(sockfd) < 0)
   {
-    //LOG_SYSERR << "sockets::close";
+    LOG_SYSERR << "sockets::close";
   }
 }
 
@@ -221,7 +181,7 @@ void sockets::shutdownWrite(int sockfd)
 {
   if (::shutdown(sockfd, SHUT_WR) < 0)
   {
-    //LOG_SYSERR << "sockets::shutdownWrite";
+    LOG_SYSERR << "sockets::shutdownWrite";
   }
 }
 

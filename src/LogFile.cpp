@@ -1,7 +1,6 @@
 #include "../include/LogFile.h"
 #include "../include/FileUtil.h"
-//#include "../include/ProcessInfo.h"
-
+#include <unistd.h>
 #include <assert.h>
 #include <stdio.h>
 #include <time.h>

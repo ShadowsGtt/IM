@@ -2,7 +2,7 @@
 #ifndef _SOCKET_H
 #define _SOCKET_H
 
-#include <boost/noncopyable.hpp>
+#include "./nocopyable.h"
 #include <string>
 
 using namespace std;
@@ -21,7 +21,7 @@ class InetAddress;
 ///
 /// It closes the sockfd when desctructs.
 /// It's thread safe, all operations are delegated to OS.
-class Socket : boost::noncopyable
+class Socket : noncopyable
 {
  public:
   explicit Socket(int sockfd) : sockfd_(sockfd){}

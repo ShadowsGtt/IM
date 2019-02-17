@@ -1,15 +1,11 @@
-#include "../include/Logging.h"
-
-#include "../include/CurrentThread.h"
-#include "../include/Timestamp.h"
-//#include "../include/TimeZone.h"
-
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
-
 #include <sstream>
 
+#include "../include/Logging.h"
+#include "../include/CurrentThread.h"
+#include "../include/Timestamp.h"
 
 
 __thread char t_errnobuf[512];

@@ -1,13 +1,12 @@
-#include "../include/LogStream.h"
-
 #include <algorithm>
 #include <limits>
-#include <boost/static_assert.hpp>
-#include <boost/type_traits/is_arithmetic.hpp>
+#include <type_traits>
 #include <assert.h>
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
+
+#include "../include/LogStream.h"
 
 using namespace detail;
 
@@ -15,12 +14,15 @@ using namespace detail;
 namespace detail
 {
 
+
 const char digits[] = "9876543210123456789";
 const char* zero = digits + 9;
-BOOST_STATIC_ASSERT(sizeof(digits) == 20);
+static_assert(sizeof(digits) == 20, "wrong number of digits");
 
 const char digitsHex[] = "0123456789ABCDEF";
-BOOST_STATIC_ASSERT(sizeof digitsHex == 17);
+static_assert(sizeof digitsHex == 17, "wrong number of digitsHex");
+
+
 
 /* 将整形数字转换成10进制字符串 */
 template<typename T>
@@ -101,10 +103,14 @@ void FixedBuffer<SIZE>::cookieEnd()
 
 void LogStream::staticCheck()
 {
-  BOOST_STATIC_ASSERT(kMaxNumericSize - 10 > std::numeric_limits<double>::digits10);
-  BOOST_STATIC_ASSERT(kMaxNumericSize - 10 > std::numeric_limits<long double>::digits10);
-  BOOST_STATIC_ASSERT(kMaxNumericSize - 10 > std::numeric_limits<long>::digits10);
-  BOOST_STATIC_ASSERT(kMaxNumericSize - 10 > std::numeric_limits<long long>::digits10);
+  static_assert(kMaxNumericSize - 10 > std::numeric_limits<double>::digits10,
+                "kMaxNumericSize is large enough");
+  static_assert(kMaxNumericSize - 10 > std::numeric_limits<long double>::digits10,
+                "kMaxNumericSize is large enough");
+  static_assert(kMaxNumericSize - 10 > std::numeric_limits<long>::digits10,
+                "kMaxNumericSize is large enough");
+  static_assert(kMaxNumericSize - 10 > std::numeric_limits<long long>::digits10,
+                "kMaxNumericSize is large enough");
 }
 
 /* 将整形数字格式化成字符串并写入缓冲区 */
@@ -194,7 +200,7 @@ LogStream& LogStream::operator<<(double v)
 template<typename T>
 Fmt::Fmt(const char* fmt, T val)
 {
-  BOOST_STATIC_ASSERT(boost::is_arithmetic<T>::value == true);
+  static_assert(std::is_arithmetic<T>::value == true, "Must be arithmetic type");
 
   length_ = snprintf(buf_, sizeof buf_, fmt, val);
   assert(static_cast<size_t>(length_) < sizeof buf_);

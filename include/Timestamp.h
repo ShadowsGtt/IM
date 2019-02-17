@@ -3,7 +3,6 @@
 
 
 #include <string>
-#include <boost/operators.hpp>
 
 
 using namespace std;
@@ -14,8 +13,7 @@ using namespace std;
 /// This class is immutable.
 /// It's recommended to pass it by value, since it's passed in register on x64.
 ///
-class Timestamp : public boost::equality_comparable<Timestamp>,
-                  public boost::less_than_comparable<Timestamp>
+class Timestamp 
 {
  public:
   
@@ -89,7 +87,25 @@ inline bool operator==(Timestamp lhs, Timestamp rhs)
   return lhs.microSecondsSinceEpoch() == rhs.microSecondsSinceEpoch();
 }
 
+inline bool operator<=(Timestamp lhs, Timestamp rhs)
+{
+  return lhs.microSecondsSinceEpoch() <= rhs.microSecondsSinceEpoch();
+}
 
+inline bool operator>=(Timestamp lhs, Timestamp rhs)
+{
+  return lhs.microSecondsSinceEpoch() >= rhs.microSecondsSinceEpoch();
+}
+
+inline bool operator>(Timestamp lhs, Timestamp rhs)
+{
+  return lhs.microSecondsSinceEpoch() > rhs.microSecondsSinceEpoch();
+}
+
+inline bool operator!=(Timestamp lhs, Timestamp rhs)
+{
+  return lhs.microSecondsSinceEpoch() != rhs.microSecondsSinceEpoch();
+}
 
 
 /* 返回两个时间差秒数 */

@@ -1,11 +1,13 @@
 #ifndef _LOGFILE_H
 #define _LOGFILE_H
 
+#include <memory>
+
+
 #include "../include/Mutex.h"
 #include "../include/Types.h"
+#include "../include/nocopyable.h"
 
-#include <boost/noncopyable.hpp>
-#include <boost/scoped_ptr.hpp>
 
 
 namespace FileUtil
@@ -15,7 +17,7 @@ class AppendFile;
 
 
 
-class LogFile : boost::noncopyable
+class LogFile : noncopyable
 {
  public:
   LogFile(const string& basename,
@@ -51,7 +53,7 @@ class LogFile : boost::noncopyable
   int count_;
 
   /* 锁 */
-  boost::scoped_ptr<MutexLock> mutex_;
+  std::unique_ptr<MutexLock> mutex_;
 
 
   /* 开始记录日志时间  当天的任何时间都会被调整为00:00 */
@@ -64,7 +66,7 @@ class LogFile : boost::noncopyable
   /* 最后一次刷新时间 */
   time_t lastFlush_;
   
-  boost::scoped_ptr<FileUtil::AppendFile> file_;
+  std::unique_ptr<FileUtil::AppendFile> file_;
 
   /* 新创建日志文件的时间间隔  24小时 */
   const static int kRollPerSeconds_ = 60*60*24;
