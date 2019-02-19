@@ -7,6 +7,7 @@
 #include <strings.h>  // bzero
 #include <netinet/in.h>
 #include <assert.h>
+#include <cstring>
 
 
 
@@ -34,6 +35,18 @@
 
 
 using namespace net;
+
+
+InetAddress::InetAddress(uint16_t port, bool loopbackOnly)
+{
+    //static_assert(offsetof(InetAddress, addr_) == 0, "addr_ offset 0");
+
+    memset(&addr_, 0 , sizeof addr_);
+    addr_.sin_family = AF_INET;
+    in_addr_t ip = loopbackOnly ? INADDR_LOOPBACK : INADDR_ANY;
+    addr_.sin_addr.s_addr = htobe32(ip);
+    addr_.sin_port = htobe16(port);
+}
 
 
 InetAddress::InetAddress(string ip, uint16_t port)

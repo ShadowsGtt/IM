@@ -22,6 +22,8 @@ class InetAddress
 {
 public:
 
+  explicit InetAddress(uint16_t port = 0, bool loopbackOnly = false);
+
   /* 构造函数  传入ip 和 port */	
   InetAddress(string ip, uint16_t port);
 
