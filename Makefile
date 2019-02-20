@@ -1,8 +1,8 @@
 CC := g++
 LIBDIR := -L/usr/libmysql
-LIB := -lpthread -lmysqlclient
+LIB := -lpthread -lmysqlclient -lprotobuf -lz 
 IDIR := -I/usr/include/mysql
-CFLAG := -std=c++11 -g
+CFLAG := -std=c++11 -g 
 
 serv_src = $(wildcard ./src/*.cpp)
 
