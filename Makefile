@@ -4,17 +4,18 @@ LIB := -lpthread -lmysqlclient -lprotobuf -lz
 IDIR := -I/usr/include/mysql
 CFLAG := -std=c++11 -g 
 
-serv_src = $(wildcard ./src/*.cpp)
+serv_src = $(wildcard ./src/*.cc)
 
-serv_obj = $(patsubst %.cpp,%.o,$(serv_src))
+serv_obj = $(patsubst %.cc,%.o,$(serv_src))
 
 .PHONY : all
-all: serv
+all : serv
+
 
 serv : $(serv_obj)
 	$(CC) $^ $(LIBDIR) -o $@ $(LIB) 
 
-%.o : %.cpp
+%.o : %.cc
 	$(CC) -c $^ $(CFLAG) $(IDIR)  -o $@
 
 
