@@ -1,7 +1,13 @@
 #include "Client.h"
 
-Client::Client(InetAddress& serverAddr) : serverAddr_(serverAddr) , 
-				client_(&loop_, serverAddr_, "Client") ,
+/*
+Client::Client(InetAddress& serverAddr) : loop_(new net::EventLoop()) ,serverAddr_(serverAddr) , conn_(),
+				client_(loop_.get(), serverAddr_, "Client") ,
+				dispatcher_(std::bind(&Client::onUnknownMessage, this, _1, _2, _3)),
+				codec_(std::bind(&ProtobufDispatcher::onProtobufMessage, &dispatcher_, _1, _2, _3))
+*/
+Client::Client(EventLoop* loop , InetAddress& serverAddr) : loop_(loop) , conn_(),
+				client_(loop_, serverAddr, "Client") ,
 				dispatcher_(std::bind(&Client::onUnknownMessage, this, _1, _2, _3)),
 				codec_(std::bind(&ProtobufDispatcher::onProtobufMessage, &dispatcher_, _1, _2, _3))
 {
@@ -14,25 +20,40 @@ Client::Client(InetAddress& serverAddr) : serverAddr_(serverAddr) ,
         std::bind(&Client::onConnection, this, _1));
     client_.setMessageCallback(
         std::bind(&ProtobufCodec::onMessage, &codec_, _1, _2, _3));
+
 }
 
 void Client::start()
 {
 	client_.connect();
-	loop_.loop();
+	//loop_->loop();
+}
+
+void Client::send(google::protobuf::Message *mesg)
+{
+	if(conn_->connected())
+	{
+		codec_.send(conn_,*mesg);
+	}
+	else
+	{
+		
+	}
+
 }
 
 void Client::onConnection(const TcpConnectionPtr& conn)
 {
+	conn_ = conn;
 	if(conn->connected())
 	{
 		cout << "连接至服务器 ：" << conn->peerAddress().toIpPort() << endl ;
-		codec_.send(conn, *messageToSends);
+		//codec_.send(conn, *messageToSends);
 	}	
 	else
 	{
 		cout << "与服务器 ：" << conn->peerAddress().toIpPort() << "   断开连接" << endl ;			
-      	loop_.quit();	
+      		//loop_->quit();	
 	}
 }
 

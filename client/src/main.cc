@@ -14,19 +14,20 @@ int main(int argc, char* argv[])
     query.set_id(1);
     query.set_username("This is UserName");
     query.set_password("This is Password");
-    
-    messageToSends = &query;
 
-    Empty empty;
 
-    if (argc > 3 && argv[3][0] == 'e')
-    {
-      messageToSends = &empty;
-    }
-
-    Client client(serverAddr);
+	EventLoop loop;
+    Client client(&loop,serverAddr);
     client.start();
+	loop.loop();
+	
+    client.send(&query);
 
+	if (argc > 3 && argv[3][0] == 'e')
+    {
+		  Empty empty;
+          client.send(&empty);
+    }
   }
   else
   {

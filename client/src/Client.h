@@ -21,13 +21,14 @@ using namespace net;
 typedef std::shared_ptr<IM::Empty> EmptyPtr;
 typedef std::shared_ptr<IM::Response> ResponsePtr;
 
-google::protobuf::Message* messageToSends;
+//google::protobuf::Message* messageToSends;
 
 class Client : noncopyable
 {
  public:
-  	
-  Client(InetAddress &serverAddr);
+  
+  Client(EventLoop* loop , InetAddress& serverAddr);
+  //Client(InetAddress &serverAddr);
   
   void start();
 
@@ -43,13 +44,16 @@ class Client : noncopyable
   void onEmpty(const net::TcpConnectionPtr&,
                const EmptyPtr& message,
                Timestamp);
+  
+  
+  void send(google::protobuf::Message*) ;
 
 private:
-  	EventLoop loop_;
+	EventLoop* loop_;
   	TcpClient client_;
-	InetAddress& serverAddr_;
 	ProtobufDispatcher dispatcher_;
 	ProtobufCodec codec_;
+	TcpConnectionPtr conn_;
 };
 
 #endif

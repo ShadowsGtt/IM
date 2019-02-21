@@ -9,6 +9,7 @@
 
 using namespace net;
 
+const int Connector::kInitRetryDelayMs;
 const int Connector::kMaxRetryDelayMs;
 
 Connector::Connector(EventLoop* loop, const InetAddress& serverAddr)
