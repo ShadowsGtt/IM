@@ -46,14 +46,15 @@ void Server::onLogin(const net::TcpConnectionPtr& conn,
                const LoginPtr& message,
                Timestamp)
 {
+	cout << endl;
 	cout << "-----------------------protobuf--start-------------------------------" << endl;
-    cout << message->GetTypeName() << message->DebugString();
+    cout << "protobuf message type :" << message->GetTypeName() <<endl 
+    	 << message->DebugString();
 	cout << "------------------------protobuf---end-------------------------------" << endl;
-    //LOG_INFO << "onQuery:\n" << message->GetTypeName() << message->DebugString();
     Response answer;
     answer.set_id(1);
     answer.set_result(true);
-	answer.set_description("登录成功!");
+	answer.set_description("Login success");
 
     codec_.send(conn, answer);
     conn->shutdown();

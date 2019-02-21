@@ -1,16 +1,12 @@
 #include "Client.h"
 
-/*
-Client::Client(InetAddress& serverAddr) : loop_(new net::EventLoop()) ,serverAddr_(serverAddr) , conn_(),
-				client_(loop_.get(), serverAddr_, "Client") ,
-				dispatcher_(std::bind(&Client::onUnknownMessage, this, _1, _2, _3)),
-				codec_(std::bind(&ProtobufDispatcher::onProtobufMessage, &dispatcher_, _1, _2, _3))
-*/
+
 Client::Client(EventLoop* loop , InetAddress& serverAddr) : loop_(loop) , conn_(),
 				client_(loop_, serverAddr, "Client") ,
 				dispatcher_(std::bind(&Client::onUnknownMessage, this, _1, _2, _3)),
 				codec_(std::bind(&ProtobufDispatcher::onProtobufMessage, &dispatcher_, _1, _2, _3))
 {
+ 	/* 收到服务器回应的回调 */
     dispatcher_.registerMessageCallback<IM::Response>(
         std::bind(&Client::onResponse, this, _1, _2, _3));
 
@@ -33,6 +29,7 @@ void Client::send(google::protobuf::Message *mesg)
 {
 	if(conn_->connected())
 	{
+		cout << "will send mesg " << endl;
 		codec_.send(conn_,*mesg);
 	}
 	else
@@ -48,7 +45,11 @@ void Client::onConnection(const TcpConnectionPtr& conn)
 	if(conn->connected())
 	{
 		cout << "连接至服务器 ：" << conn->peerAddress().toIpPort() << endl ;
-		//codec_.send(conn, *messageToSends);
+		Login query;
+   	 	query.set_id(1);
+    	query.set_username("This is UserName");
+    	query.set_password("This is Password");
+		codec_.send(conn, query);
 	}	
 	else
 	{
@@ -64,12 +65,16 @@ void Client::onUnknownMessage(const TcpConnectionPtr&,
     LOG_INFO << "onUnknownMessage: " << message->GetTypeName();
 }
 
+
+/* 客户端收到的回应 */
 void Client::onResponse(const net::TcpConnectionPtr&,
                 const ResponsePtr& message,
                 Timestamp)
 {
+	cout << endl;
 	cout << "--------------------protobuf----response----------------" << endl;
-    LOG_INFO << message->GetTypeName() << message->DebugString();
+    cout << "protobuf message type : "<< message->GetTypeName() <<endl
+         << message->DebugString();
   	cout << "--------------------protobuf----response----------------" << endl;
 }
 
