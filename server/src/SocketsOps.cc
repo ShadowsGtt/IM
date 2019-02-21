@@ -258,26 +258,17 @@ struct sockaddr_in sockets::getPeerAddr(int sockfd)
 }
 
 
-/*
 
-#if !(__GNUC_PREREQ (4,6))
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#endif
 bool sockets::isSelfConnect(int sockfd)
 {
-  struct sockaddr_in6 localaddr = getLocalAddr(sockfd);
-  struct sockaddr_in6 peeraddr = getPeerAddr(sockfd);
-  if (localaddr.sin6_family == AF_INET)
+  struct sockaddr_in localaddr = getLocalAddr(sockfd);
+  struct sockaddr_in peeraddr = getPeerAddr(sockfd);
+  if (localaddr.sin_family == AF_INET)
   {
     const struct sockaddr_in* laddr4 = reinterpret_cast<struct sockaddr_in*>(&localaddr);
     const struct sockaddr_in* raddr4 = reinterpret_cast<struct sockaddr_in*>(&peeraddr);
     return laddr4->sin_port == raddr4->sin_port
         && laddr4->sin_addr.s_addr == raddr4->sin_addr.s_addr;
-  }
-  else if (localaddr.sin6_family == AF_INET6)
-  {
-    return localaddr.sin6_port == peeraddr.sin6_port
-        && memcmp(&localaddr.sin6_addr, &peeraddr.sin6_addr, sizeof localaddr.sin6_addr) == 0;
   }
   else
   {
@@ -285,4 +276,4 @@ bool sockets::isSelfConnect(int sockfd)
   }
 }
 
-*/
+

@@ -56,7 +56,7 @@ struct sockaddr_in getLocalAddr(int sockfd);
 struct sockaddr_in getPeerAddr(int sockfd);
 
 
-//bool isSelfConnect(int sockfd);
+bool isSelfConnect(int sockfd);
 
 }
 }
