@@ -2,7 +2,9 @@
 #define _CLIENT_H
 
 #include "../../server/src/dispatcher.h"
+#include "../../server/src/CountDownLatch.h"
 #include "../../server/src/codec.h"
+#include "../../server/src/Thread.h"
 #include "../../server/src/IM.pb.h"
 
 #include "../../server/src/Logging.h"
@@ -27,12 +29,14 @@ class Client : noncopyable
 {
  public:
   
-  Client(EventLoop* loop , InetAddress& serverAddr);
-  //Client(InetAddress &serverAddr);
+  //Client(EventLoop* loop , InetAddress& serverAddr);
+  Client(InetAddress serverAddr);
   
   void start();
 
-  void onConnection(const TcpConnectionPtr& conn);
+  void runLoop();
+
+  void onConnection(const TcpConnectionPtr &conn);
 
   void onUnknownMessage(const TcpConnectionPtr&,
                         const MessagePtr& message,
@@ -49,11 +53,14 @@ class Client : noncopyable
   void send(google::protobuf::Message*) ;
 
 private:
-	EventLoop* loop_;
-  	TcpClient client_;
-	ProtobufDispatcher dispatcher_;
-	ProtobufCodec codec_;
-	TcpConnectionPtr conn_;
+  InetAddress servAddr_;
+  std::shared_ptr<EventLoop> loop_;
+  std::shared_ptr<TcpClient> tcpClient_;
+  std::shared_ptr<ProtobufDispatcher> dispatcher_;
+  std::shared_ptr<ProtobufCodec> codec_;
+  CountDownLatch latch_;
+  std::shared_ptr<Thread> thread_;
+  TcpConnectionPtr conn_;
 };
 
 #endif

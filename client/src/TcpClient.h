@@ -4,6 +4,9 @@
 #include "../../server/src/Mutex.h"
 #include "../../server/src/TcpConnection.h"
 
+#include <iostream>
+
+using namespace std;
 
 namespace net
 {
@@ -41,7 +44,7 @@ class TcpClient : noncopyable
   /// Set connection callback.
   /// Not thread safe.
   void setConnectionCallback(ConnectionCallback cb)
-  { connectionCallback_ = std::move(cb); }
+  { connectionCallback_ = std::move(cb);}
 
   /// Set message callback.
   /// Not thread safe.
@@ -71,6 +74,7 @@ class TcpClient : noncopyable
   int nextConnId_;
   mutable MutexLock mutex_;
   TcpConnectionPtr connection_ ;
+  TcpConnectionPtr conn_ ;
 };
 
 }  // namespace net

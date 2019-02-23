@@ -1,61 +1,80 @@
 #include "Client.h"
 
 
-Client::Client(EventLoop* loop , InetAddress& serverAddr) : loop_(loop) , conn_(),
-				client_(loop_, serverAddr, "Client") ,
-				dispatcher_(std::bind(&Client::onUnknownMessage, this, _1, _2, _3)),
-				codec_(std::bind(&ProtobufDispatcher::onProtobufMessage, &dispatcher_, _1, _2, _3))
+Client::Client(InetAddress serverAddr) : servAddr_(serverAddr), 
+            loop_(NULL), tcpClient_(NULL),
+            dispatcher_(NULL), codec_(NULL),
+            latch_(1)
+{}
+
+void Client::runLoop()
 {
- 	/* 收到服务器回应的回调 */
-    dispatcher_.registerMessageCallback<IM::Response>(
+    loop_ = std::make_shared<EventLoop>();
+    //latch_.wait();
+    tcpClient_ = std::make_shared<TcpClient>(loop_.get(), servAddr_, "Client");
+    dispatcher_ = std::make_shared<ProtobufDispatcher>(std::bind(&Client::onUnknownMessage, this, _1, _2, _3) );
+    codec_ = std::make_shared<ProtobufCodec>(std::bind(&ProtobufDispatcher::onProtobufMessage, dispatcher_.get(), _1, _2, _3));
+
+    //收到服务器对应消息的回调 
+    dispatcher_->registerMessageCallback<IM::Response>(
         std::bind(&Client::onResponse, this, _1, _2, _3));
-
-    dispatcher_.registerMessageCallback<IM::Empty>(
+    dispatcher_->registerMessageCallback<IM::Empty>(
         std::bind(&Client::onEmpty, this, _1, _2, _3));
-    client_.setConnectionCallback(
-        std::bind(&Client::onConnection, this, _1));
-    client_.setMessageCallback(
-        std::bind(&ProtobufCodec::onMessage, &codec_, _1, _2, _3));
 
+
+    tcpClient_->setConnectionCallback(
+        std::bind(&Client::onConnection, this, _1));
+    tcpClient_->setMessageCallback(
+        std::bind(&ProtobufCodec::onMessage, codec_.get(), _1, _2, _3));
+    latch_.countDown();
+    loop_->loop();
 }
+
 
 void Client::start()
 {
-	client_.connect();
-	//loop_->loop();
+    thread_ = std::make_shared<Thread>(std::bind(&Client::runLoop,this),"loop Thread");
+    thread_->start();
+    latch_.wait();
+
+    tcpClient_->connect();
 }
 
 void Client::send(google::protobuf::Message *mesg)
 {
-	if(conn_->connected())
-	{
-		cout << "will send mesg " << endl;
-		codec_.send(conn_,*mesg);
-	}
-	else
-	{
-		
-	}
+    cout << tcpClient_->connection().use_count() << endl;
+    //cout << "3 send  use_count :" << conn_.use_count() << endl;
+    if(this->conn_ == NULL)
+        cout << "is NULL" << endl;
+    else 
+        cout << "not NULL " << endl;
+        /*
+    if(tcpClient_->connection() != NULL)
+    {
+        
+        if(tcpClient_->connection()->connected())
+        {
+            cout << "will send mesg " << endl;
+            codec_->send(tcpClient_->connection(),*mesg);
+        }
+        else
+        {
 
+        }
+    }
+    else
+        cout << "not NULL " << endl;
+*/
 }
 
-void Client::onConnection(const TcpConnectionPtr& conn)
+void Client::onConnection(const TcpConnectionPtr &conn)
 {
-	conn_ = conn;
+    conn_ = conn;
+    cout << "use count :" << conn_.use_count() << endl;
 	if(conn->connected())
-	{
-		cout << "连接至服务器 ：" << conn->peerAddress().toIpPort() << endl ;
-		Login query;
-   	 	query.set_id(1);
-    	query.set_username("This is UserName");
-    	query.set_password("This is Password");
-		codec_.send(conn, query);
-	}	
-	else
-	{
-		cout << "与服务器 ：" << conn->peerAddress().toIpPort() << "   断开连接" << endl ;			
-      		//loop_->quit();	
-	}
+    {
+		cout << "与" << conn->peerAddress().toIpPort() << "建立连接"  << endl ;
+    }
 }
 
 void Client::onUnknownMessage(const TcpConnectionPtr&,

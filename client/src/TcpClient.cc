@@ -118,6 +118,7 @@ void TcpClient::stop()
   connector_->stop();
 }
 
+
 void TcpClient::newConnection(int sockfd)
 {
   loop_->assertInLoopThread();
@@ -145,6 +146,7 @@ void TcpClient::newConnection(int sockfd)
     MutexLockGuard lock(mutex_);
     connection_ = conn;
   }
+cout << "2 use count :" << conn.use_count() << endl;
   conn->connectEstablished();
 }
 

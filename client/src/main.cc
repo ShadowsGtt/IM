@@ -4,37 +4,32 @@
 
 
 
-void runClient(Client *cli,const char *ip,uint16_t port)
+void runClient(Client *client)
 {
-	EventLoop loop;	
-	InetAddress serverAddr(ip, port);
-	Client client(&loop,serverAddr);
-	cli = &client;
-	
-	client.start();
-	loop.loop();
 }
 
 
 
 int main(int argc, char* argv[])
 {
-  LOG_INFO << "pid = " << getpid();
+  //LOG_INFO << "pid = " << getpid();
   if (argc > 2)
   {
 	uint16_t port = static_cast<uint16_t>(atoi(argv[2]));
-    
-    InetAddress serverAddr(argv[1], port);
-	EventLoop loop;	
-	Client client(&loop,serverAddr);
-	client.start();
-	loop.loop();
-    
-    //client.send(&query);
-	if (argc > 3 && argv[3][0] == 'e')
+    const char *ip = argv[1]; 
+
+    InetAddress serverAddr(ip, port);
+    Client client(serverAddr);
+
+    client.start();
+
+    Login query;
+    query.set_id(1);
+    query.set_username("This is username");
+    query.set_password("This is password");
+    client.send(&query);
+    while(1)
     {
-		  Empty empty;
-          client.send(&empty);
     }
   }
   else
