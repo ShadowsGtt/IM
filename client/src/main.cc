@@ -12,16 +12,20 @@ void runClient(Client *client)
 
 int main(int argc, char* argv[])
 {
-  //LOG_INFO << "pid = " << getpid();
-  if (argc > 2)
-  {
-	uint16_t port = static_cast<uint16_t>(atoi(argv[2]));
+    if (argc < 2)
+    {
+        printf("Usage: %s host_ip port [q|e]\n", argv[0]);
+        return -1;
+    }
+    //LOG_INFO << "pid = " << getpid();
+    uint16_t port = static_cast<uint16_t>(atoi(argv[2]));
     const char *ip = argv[1]; 
 
     InetAddress serverAddr(ip, port);
     Client client(serverAddr);
 
     client.start();
+
 
     Login query;
     query.set_id(1);
@@ -31,11 +35,6 @@ int main(int argc, char* argv[])
     while(1)
     {
     }
-  }
-  else
-  {
-    printf("Usage: %s host_ip port [q|e]\n", argv[0]);
-  }
 }
 
 

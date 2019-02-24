@@ -4,13 +4,13 @@
 Client::Client(InetAddress serverAddr) : servAddr_(serverAddr), 
             loop_(NULL), tcpClient_(NULL),
             dispatcher_(NULL), codec_(NULL),
-            latch_(1)
+            latch_(1),
+            latch2_(1)
 {}
 
 void Client::runLoop()
 {
     loop_ = std::make_shared<EventLoop>();
-    //latch_.wait();
     tcpClient_ = std::make_shared<TcpClient>(loop_.get(), servAddr_, "Client");
     dispatcher_ = std::make_shared<ProtobufDispatcher>(std::bind(&Client::onUnknownMessage, this, _1, _2, _3) );
     codec_ = std::make_shared<ProtobufCodec>(std::bind(&ProtobufDispatcher::onProtobufMessage, dispatcher_.get(), _1, _2, _3));
@@ -35,27 +35,25 @@ void Client::start()
 {
     thread_ = std::make_shared<Thread>(std::bind(&Client::runLoop,this),"loop Thread");
     thread_->start();
+    
+    /* 等待新线程运行 */
     latch_.wait();
 
+    /* 尝试与服务器建立连接 */
     tcpClient_->connect();
+    
+    /* 等待连接建立 */
+    latch2_.wait();
 }
 
 void Client::send(google::protobuf::Message *mesg)
 {
-    cout << tcpClient_->connection().use_count() << endl;
-    //cout << "3 send  use_count :" << conn_.use_count() << endl;
-    if(this->conn_ == NULL)
-        cout << "is NULL" << endl;
-    else 
-        cout << "not NULL " << endl;
-        /*
-    if(tcpClient_->connection() != NULL)
+    if(conn_)
     {
         
-        if(tcpClient_->connection()->connected())
+        if(conn_->connected())
         {
-            cout << "will send mesg " << endl;
-            codec_->send(tcpClient_->connection(),*mesg);
+            codec_->send(conn_,*mesg);
         }
         else
         {
@@ -63,18 +61,24 @@ void Client::send(google::protobuf::Message *mesg)
         }
     }
     else
-        cout << "not NULL " << endl;
-*/
+    {
+        cout << "发送失败...(连接不存在)" << endl;
+    }
 }
 
 void Client::onConnection(const TcpConnectionPtr &conn)
 {
-    conn_ = conn;
-    cout << "use count :" << conn_.use_count() << endl;
 	if(conn->connected())
     {
-		cout << "与" << conn->peerAddress().toIpPort() << "建立连接"  << endl ;
+        conn_ = conn;
+        latch2_.countDown();
+        LOG_INFO << " connect to " << conn->peerAddress().toIpPort() ;
     }
+    else 
+    {
+		LOG_INFO << " disconnect with " << conn_->peerAddress().toIpPort() ;
+		conn_ = NULL;    
+	}
 }
 
 void Client::onUnknownMessage(const TcpConnectionPtr&,

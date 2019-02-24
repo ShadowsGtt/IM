@@ -55,8 +55,8 @@ TcpClient::TcpClient(EventLoop* loop,
   connector_->setNewConnectionCallback(
       std::bind(&TcpClient::newConnection, this, _1));
   // FIXME setConnectFailedCallback
-  LOG_INFO << "TcpClient::TcpClient[" << name_
-           << "] - connector " << get_pointer(connector_);
+  //LOG_INFO << "TcpClient::TcpClient[" << name_
+   //        << "] - connector " << get_pointer(connector_);
 }
 
 TcpClient::~TcpClient()
@@ -93,8 +93,8 @@ TcpClient::~TcpClient()
 void TcpClient::connect()
 {
   // FIXME: check state
-  LOG_INFO << "TcpClient::connect[" << name_ << "] - connecting to "
-           << connector_->serverAddress().toIpPort();
+  //LOG_INFO << "TcpClient::connect[" << name_ << "] - connecting to "
+  //         << connector_->serverAddress().toIpPort();
   connect_ = true;
   connector_->start();
 }
@@ -146,7 +146,6 @@ void TcpClient::newConnection(int sockfd)
     MutexLockGuard lock(mutex_);
     connection_ = conn;
   }
-cout << "2 use count :" << conn.use_count() << endl;
   conn->connectEstablished();
 }
 

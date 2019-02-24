@@ -52,6 +52,7 @@ class Client : noncopyable
   
   void send(google::protobuf::Message*) ;
 
+
 private:
   InetAddress servAddr_;
   std::shared_ptr<EventLoop> loop_;
@@ -59,6 +60,7 @@ private:
   std::shared_ptr<ProtobufDispatcher> dispatcher_;
   std::shared_ptr<ProtobufCodec> codec_;
   CountDownLatch latch_;
+  CountDownLatch latch2_;
   std::shared_ptr<Thread> thread_;
   TcpConnectionPtr conn_;
 };

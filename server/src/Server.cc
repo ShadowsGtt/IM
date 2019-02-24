@@ -35,11 +35,11 @@ void Server::onConnection(const TcpConnectionPtr& conn)
 {
 	if(conn->connected())
 	{
-		LOG_INFO << conn->peerAddress().toIpPort() << "  连接到服务器 ";
+		LOG_INFO << conn->peerAddress().toIpPort() << "  connected! ";
 	}
 	else
 	{	
-		LOG_INFO << conn->peerAddress().toIpPort() << "  与服务其断开连接 ";
+		LOG_INFO << conn->peerAddress().toIpPort() << "  disconnected! ";
 	}
 }
 void Server::onLogin(const net::TcpConnectionPtr& conn,
@@ -57,6 +57,6 @@ void Server::onLogin(const net::TcpConnectionPtr& conn,
 	answer.set_description("Login success");
 
     codec_.send(conn, answer);
-    conn->shutdown();
+    //conn->shutdown();
 }
 
