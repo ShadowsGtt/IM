@@ -1,5 +1,5 @@
 CC := g++
-LIBDIR := -L/usr/libmysql
+LIBDIR := -L/usr/libmysql -L/usr/lib64/mysql/   #ubuntu , centos
 LIB := -lpthread -lmysqlclient -lprotobuf -lz 
 IDIR := -I/usr/include/mysql
 CFLAG := -std=c++11 -g 
@@ -25,6 +25,8 @@ CLR_EXEC = $(wildcard ./client)
 
 .PHONY:clean
 clean:
-	$(if $(CLR) $(shell rm ./src/*.o ),) 
-	$(if $(CLR_EXEC) $(shell rm ./client ),)
+	#$(if $(CLR) $(shell rm -rf ./src/*.o ),) 
+	#$(if $(CLR_EXEC) $(shell rm -rf ./client ),)
+	rm -rf ./src/*.o 
+	rm -rf ./client
 
