@@ -3,17 +3,22 @@ LIBDIR := -L/usr/libmysql -L/usr/lib64/mysql/   #ubuntu , centos
 LIB := -lpthread -lmysqlclient -lprotobuf -lz 
 IDIR := -I/usr/include/mysql
 CFLAG := -std=c++11 -g 
+BINDIR := ./bin/
+OUTPUT := ./output/
 
 serv_src = $(wildcard ./src/*.cc)
 
 serv_obj = $(patsubst %.cc,%.o,$(serv_src))
 
 .PHONY : all
-all : serv
+all : build serv  
 
+.PHONY : build
+build :
+	sh build.sh
 
 serv : $(serv_obj)
-	$(CC) $^ $(LIBDIR) -o $@ $(LIB) 
+	$(CC) $^ $(LIBDIR) -o $(BINDIR)$@ $(LIB) 
 
 %.o : %.cc
 	$(CC) -c $^ $(CFLAG) $(IDIR)  -o $@
@@ -27,5 +32,5 @@ serv : $(serv_obj)
 .PHONY:clean
 clean:
 	rm -rf ./src/*.o
-	rm -rf ./serv
+	rm -rf ./bin/serv
 

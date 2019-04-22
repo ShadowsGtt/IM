@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Server::Server() : addr_("0.0.0.0",8888) , server_(&loop_,addr_,"IM Server"),
+Server::Server() : addr_("0.0.0.0",9999) , server_(&loop_,addr_,"IM Server"),
 		dispatcher_(std::bind(&Server::onUnknownMessage, this, _1, _2, _3)),
 		codec_(std::bind(&ProtobufDispatcher::onProtobufMessage, &dispatcher_, _1, _2, _3))
 {	
