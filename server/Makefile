@@ -15,7 +15,9 @@ all : build serv
 
 .PHONY : build
 build :
-	sh build.sh
+	cd proto;protoc IM.proto --cpp_out=.;cp *.pb.* ../src/;cd .. 
+	if [ ! -d "bin" ]; then mkdir bin; fi
+	
 
 serv : $(serv_obj)
 	$(CC) $^ $(LIBDIR) -o $(BINDIR)$@ $(LIB) 
@@ -32,5 +34,5 @@ serv : $(serv_obj)
 .PHONY:clean
 clean:
 	rm -rf ./src/*.o
-	rm -rf ./bin/serv
+	rm -rf ./bin
 
