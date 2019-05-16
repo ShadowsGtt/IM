@@ -1,12 +1,12 @@
 #include <iostream>
-#include "../include/LogFile.h"
-#include "../include/Logging.h"
+#include "../server/src/LogFile.h"
+#include "../server/src/Logging.h"
 
 using namespace std;
 
 
 
-LogFile file("filename",1024,false);
+LogFile file("./log/filename",1024,false);
 
 
 void setOutPut(const char *msg ,int len )

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../include/Thread.h"
+#include "../server/src/Thread.h"
 #include <functional>
 
 using namespace std;

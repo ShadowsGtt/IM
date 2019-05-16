@@ -1,6 +1,6 @@
 #include <iostream>
-#include "../include/Thread.h"
-#include "../include/ThreadPool.h"
+#include "../server/src/Thread.h"
+#include "../server/src/ThreadPool.h"
 #include <functional>
 
 using namespace std;

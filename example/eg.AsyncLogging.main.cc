@@ -1,8 +1,8 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
-#include "../include/AsyncLogging.h"
-#include "../include/Logging.h"
+#include "../server/src/AsyncLogging.h"
+#include "../server/src/Logging.h"
 
 using namespace std;
 
