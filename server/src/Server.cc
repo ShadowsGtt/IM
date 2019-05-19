@@ -7,19 +7,19 @@ Server::Server() : //addr_("0.0.0.0",9999) , server_(&loop_,addr_,"IM Server"),
 		dispatcher_(std::bind(&Server::onUnknownMessage, this, _1, _2, _3)),
 		codec_(std::bind(&ProtobufDispatcher::onProtobufMessage, &dispatcher_, _1, _2, _3))
 {
-    //configMap_ = readConfig("../conf/server.conf");
+    configMap_ = readConfig("../conf/server.conf");
 
     loop_ = new EventLoop();
-    //addr_.setIpPort(configMap_["host"], std::stoi(configMap_["port"]));
-    //server_ = new TcpServer(loop_,addr_,configMap_["serverName"]);
+    addr_.setIpPort(configMap_["host"], std::stoi(configMap_["port"]));
+    server_ = new TcpServer(loop_,addr_,configMap_["serverName"]);
 
-    //server_->setThreadNum(std::stoi(configMap_["ioThreadNumber"]));
+    server_->setThreadNum(std::stoi(configMap_["ioThreadNumber"]));
 
 
-    addr_.setIpPort("0.0.0.0", 9999);
-    server_ = new TcpServer(loop_,addr_,"serverName");
-
-    server_->setThreadNum(5);
+//    addr_.setIpPort("0.0.0.0", 9999);
+//    server_ = new TcpServer(loop_,addr_,"serverName");
+//
+//    server_->setThreadNum(5);
 
     /* 根据消息类型注册该类型消息回调 */
 	dispatcher_.registerMessageCallback<IM::Login>(
