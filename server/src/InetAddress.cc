@@ -39,8 +39,6 @@ using namespace net;
 
 InetAddress::InetAddress(uint16_t port, bool loopbackOnly)
 {
-    //static_assert(offsetof(InetAddress, addr_) == 0, "addr_ offset 0");
-
     memset(&addr_, 0 , sizeof addr_);
     addr_.sin_family = AF_INET;
     in_addr_t ip = loopbackOnly ? INADDR_LOOPBACK : INADDR_ANY;
@@ -50,6 +48,12 @@ InetAddress::InetAddress(uint16_t port, bool loopbackOnly)
 
 
 InetAddress::InetAddress(string ip, uint16_t port)
+{
+    bzero(&addr_, sizeof addr_);
+    sockets::fromIpPort(ip.c_str(), port, &addr_);
+}
+
+void InetAddress::setIpPort(string ip, uint16_t port)
 {
     bzero(&addr_, sizeof addr_);
     sockets::fromIpPort(ip.c_str(), port, &addr_);

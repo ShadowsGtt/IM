@@ -20,7 +20,6 @@ using namespace std;
 using namespace IM;
 using namespace net;
 
-typedef std::shared_ptr<IM::Empty> EmptyPtr;
 typedef std::shared_ptr<IM::Response> ResponsePtr;
 
 //google::protobuf::Message* messageToSends;
@@ -45,9 +44,9 @@ class Client : noncopyable
                 const ResponsePtr& message,
                 Timestamp);
 
-  void onEmpty(const net::TcpConnectionPtr&,
-               const EmptyPtr& message,
-               Timestamp);
+//  void onEmpty(const net::TcpConnectionPtr&,
+//               const EmptyPtr& message,
+//               Timestamp);
   
   
   void send(google::protobuf::Message*) ;

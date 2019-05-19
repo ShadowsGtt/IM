@@ -1,11 +1,9 @@
 #ifndef _SERVER_H
 #define _SERVER_H
 
-
 #include "codec.h"
 #include "dispatcher.h"
 #include "IM.pb.h"
-
 #include "Logging.h"
 #include "Mutex.h"
 #include "EventLoop.h"
@@ -14,15 +12,15 @@
 #include <stdio.h>
 #include <unistd.h>
 
+map<string,string> readConfig(const char*);
+
 using namespace net;
 using namespace IM;
 
-
-
 typedef std::shared_ptr<IM::Login> LoginPtr;
-typedef std::shared_ptr<IM::Response> ResponsePtr;
-
-
+typedef std::shared_ptr<IM::Register> RegisterPtr;
+typedef std::shared_ptr<IM::SingleChat> SingleChatPtr;
+typedef std::shared_ptr<IM::GroupChat> GroupChatPtr;
 
 class Server : noncopyable
 {
@@ -40,18 +38,31 @@ class Server : noncopyable
     conn->shutdown();
   }
 
-  void start();
+    void start();
 
+    void Login(const net::TcpConnectionPtr &conn,
+               const LoginPtr &message,
+               Timestamp timestamp);
 
-  void onLogin(const net::TcpConnectionPtr& conn,
-               const LoginPtr& message,
-               Timestamp);
+    void Register(const net::TcpConnectionPtr &conn,
+                  const RegisterPtr &message,
+                  Timestamp timestamp);
+
+    void SingleChat(const net::TcpConnectionPtr &conn,
+                    const SingleChatPtr &message,
+                    Timestamp timestamp);
+
+    void GroupChat(const net::TcpConnectionPtr &conn,
+                   const GroupChatPtr &message,
+                   Timestamp timestamp);
+
 
  private:
-	uint16_t IoThreadNum;               /* IO线程数 */
-	EventLoop loop_;                    /* 主线程循环 */
+	//uint16_t IoThreadNum;               /* IO线程数 */
+    map<string,string> configMap_;       /* 配置 */
+	EventLoop *loop_;                    /* 主线程循环 */
 	InetAddress addr_;                  /* 服务器地址 */
-	TcpServer server_;                  /* tcp server */
+	TcpServer *server_;                  /* tcp server */
   	ProtobufDispatcher dispatcher_;     /* 协议包分发 */
   	ProtobufCodec codec_;               /* 编解码 */
 

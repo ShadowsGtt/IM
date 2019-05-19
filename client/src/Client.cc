@@ -18,9 +18,6 @@ void Client::runLoop()
     //收到服务器对应消息的回调 
     dispatcher_->registerMessageCallback<IM::Response>(
         std::bind(&Client::onResponse, this, _1, _2, _3));
-    dispatcher_->registerMessageCallback<IM::Empty>(
-        std::bind(&Client::onEmpty, this, _1, _2, _3));
-
 
     tcpClient_->setConnectionCallback(
         std::bind(&Client::onConnection, this, _1));
@@ -50,7 +47,6 @@ void Client::send(google::protobuf::Message *mesg)
 {
     if(conn_)
     {
-        
         if(conn_->connected())
         {
             codec_->send(conn_,*mesg);
@@ -101,10 +97,10 @@ void Client::onResponse(const net::TcpConnectionPtr&,
   	cout << "--------------------protobuf----response----------------" << endl;
 }
 
-void Client::onEmpty(const net::TcpConnectionPtr&,
-               const EmptyPtr& message,
-               Timestamp)
-{
-    LOG_INFO << "onEmpty: " << message->GetTypeName();
-}
+//void Client::onEmpty(const net::TcpConnectionPtr&,
+//               const EmptyPtr& message,
+//               Timestamp)
+//{
+//    LOG_INFO << "onEmpty: " << message->GetTypeName();
+//}
 

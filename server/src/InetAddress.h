@@ -24,8 +24,10 @@ public:
 
   explicit InetAddress(uint16_t port = 0, bool loopbackOnly = false);
 
-  /* 构造函数  传入ip 和 port */	
+  /* 构造函数  传入ip 和 port */
   InetAddress(string ip, uint16_t port);
+
+  void setIpPort(string ip, uint16_t port);
 
   /* 构造函数  传入struct sockaddr_in结构体 */
   explicit InetAddress(const struct sockaddr_in& addr) : addr_(addr){}
