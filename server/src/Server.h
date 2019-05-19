@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-map<string,string> readConfig(const char*);
 
 using namespace net;
 using namespace IM;
