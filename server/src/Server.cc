@@ -25,6 +25,12 @@ Server::Server() : dispatcher_(std::bind(&Server::onUnknownMessage, this, _1, _2
     Logger::setOutput(logOutput);
     LOG_INFO << "config read finished" ;
 
+    //创建线程池
+    threadPool_ = new ThreadPool("ThreadPool");
+    threadPool_->setMaxQueueSize(1024);
+    LOG_INFO << "thread pool start running";
+
+    // 创建事件循环
     loop_ = new EventLoop();
     addr_.setIpPort(configMap_["host"], std::stoi(configMap_["port"]));
     server_ = new TcpServer(loop_,addr_,configMap_["serverName"]);
@@ -49,10 +55,17 @@ Server::Server() : dispatcher_(std::bind(&Server::onUnknownMessage, this, _1, _2
     server_->setMessageCallback(
             std::bind(&ProtobufCodec::onMessage, &codec_, _1, _2, _3));
 }
+
+//void Server::addTask(const Task &task)
+//{
+//    threadPool_->addTask(task);
+//}
+
 void Server::start()
 {
     // 启动异步日志系统
     log_->start();
+    threadPool_->start(std::stoi(configMap_["tpNum"]));
     server_->start();
     LOG_INFO << "server start running";
 	loop_->loop();

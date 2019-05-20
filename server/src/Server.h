@@ -9,6 +9,7 @@
 #include "EventLoop.h"
 #include "TcpServer.h"
 #include "AsyncLogging.h"
+#include "ThreadPool.h"
 
 #include <stdio.h>
 #include <unistd.h>
@@ -17,28 +18,30 @@
 using namespace net;
 using namespace IM;
 
-typedef std::shared_ptr<IM::Login> LoginPtr;
-typedef std::shared_ptr<IM::Register> RegisterPtr;
-typedef std::shared_ptr<IM::SingleChat> SingleChatPtr;
-typedef std::shared_ptr<IM::GroupChat> GroupChatPtr;
+typedef std::shared_ptr <IM::Login> LoginPtr;
+typedef std::shared_ptr <IM::Register> RegisterPtr;
+typedef std::shared_ptr <IM::SingleChat> SingleChatPtr;
+typedef std::shared_ptr <IM::GroupChat> GroupChatPtr;
 
-class Server : noncopyable
-{
- public:
+class Server : noncopyable {
+public:
+    typedef std::function<void()> Task;
 
-  Server();
 
-  void onConnection(const TcpConnectionPtr& conn);
+    Server();
 
-  void onUnknownMessage(const TcpConnectionPtr& conn,
-                        const MessagePtr& message,
-                        Timestamp)
-  {
-    LOG_INFO << "onUnknownMessage: " << message->GetTypeName();
-    conn->shutdown();
-  }
+    void onConnection(const TcpConnectionPtr &conn);
+
+    void onUnknownMessage(const TcpConnectionPtr &conn,
+                          const MessagePtr &message,
+                          Timestamp) {
+        LOG_INFO << "onUnknownMessage: " << message->GetTypeName();
+        conn->shutdown();
+    }
 
     void start();
+
+    //void addTask(const Task &task);
 
     void Login(const net::TcpConnectionPtr &conn,
                const LoginPtr &message,
@@ -58,6 +61,7 @@ class Server : noncopyable
 
     static AsyncLogging *log_;                     // 异步日志
 private:
+    ThreadPool *threadPool_;                // 线程池
     map <string, string> configMap_;        // 配置
     EventLoop *loop_;                       // 主线程循环
     InetAddress addr_;                      // 服务器地址
