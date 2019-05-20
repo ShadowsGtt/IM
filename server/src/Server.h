@@ -8,6 +8,7 @@
 #include "Mutex.h"
 #include "EventLoop.h"
 #include "TcpServer.h"
+#include "AsyncLogging.h"
 
 #include <stdio.h>
 #include <unistd.h>
@@ -55,16 +56,14 @@ class Server : noncopyable
                    const GroupChatPtr &message,
                    Timestamp timestamp);
 
-
- private:
-	//uint16_t IoThreadNum;               /* IO线程数 */
-    map<string,string> configMap_;       /* 配置 */
-	EventLoop *loop_;                    /* 主线程循环 */
-	InetAddress addr_;                  /* 服务器地址 */
-	TcpServer *server_;                  /* tcp server */
-  	ProtobufDispatcher dispatcher_;     /* 协议包分发 */
-  	ProtobufCodec codec_;               /* 编解码 */
-
+    static AsyncLogging *log_;                     // 异步日志
+private:
+    map <string, string> configMap_;        // 配置
+    EventLoop *loop_;                       // 主线程循环
+    InetAddress addr_;                      // 服务器地址
+    TcpServer *server_;                     // tcp server
+    ProtobufDispatcher dispatcher_;         // 协议包分发
+    ProtobufCodec codec_;                   // 编解码
 };
 
 #endif

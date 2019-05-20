@@ -10,6 +10,7 @@
 #include <map>
 #include <utility>
 #include <vector>
+#include <stdio.h>
 
 using namespace std;
 
@@ -17,14 +18,16 @@ namespace
 {
     vector<string> knownFields =
     {
-        "host"              ,       /* 服务器ip         */
-        "port"              ,       /* 服务器port       */
-        "ioThreadNumber"    ,       /* io线程数目       */
-        "serverName"        ,       /* 服务器名字       */
-        "maxConn"           ,       /* 客户最大连接数   */
-        "tpNum"             ,       /* 线程池线程数     */
-        "daemon"            ,       /* 是否设置守护进程 */
-        "maxFd"                     /* 最大fd数目       */
+        "host"              ,       // 服务器ip
+        "port"              ,       // 服务器port
+        "ioThreadNumber"    ,       // io线程数目
+        "serverName"        ,       // 服务器名字
+        "maxConn"           ,       // 客户最大连接数
+        "tpNum"             ,       // 线程池线程数
+        "daemon"            ,       // 是否设置守护进程
+        //"maxFd"             ,       // 最大fd数目
+        "logFlushInterval"  ,       // 日志刷磁盘间隔
+        "logRollSie"                // 日志回滚尺寸
     };
 
 
@@ -39,9 +42,9 @@ namespace
         while(true)
         {
             begin = line.begin();
-            if(*begin == ' '){
+            if(*begin == ' ' || *begin == '\t'){
                 line.erase(begin);
-                begin++;
+                //begin++;
                 continue;
             }
             break;
@@ -50,9 +53,9 @@ namespace
         while(true)
         {
             end = line.end()-1;
-            if(*end == ' '){
+            if(*end == ' ' || *end == '\t'){
                 line.erase(end);
-                end--;
+                //end--;
                 continue;
             }
             break;
@@ -74,11 +77,11 @@ namespace
         string::const_iterator strEnd;
         strBegin = strEnd = line.end();
 
-        for(string::const_iterator it = line.begin();it != line.end(); it++){
+        for(string::const_iterator it = line.begin();it != line.end() ; it++){
             if( *it != ' ' && strBegin == line.end()){
                     strBegin = it;
             }
-            else if( *it == ' ' || it == line.end()){
+            else if( *it == ' ' || it == line.end() ){
                 strEnd = it;
                 if(strBegin != line.end()){
                     store.push_back(line.substr(strBegin-line.begin(),strEnd-strBegin));
@@ -107,7 +110,6 @@ namespace
         vector<string> values = kv.second ;
         string value = kv.second[0];
 
-
         if(values.size() > 1){
             cerr << "*** FATAL CONFIG FILE ERROR ***" << endl;
             cerr << "error at line " << curline << ":" << line << endl;
@@ -116,14 +118,14 @@ namespace
         if(find(knownFields.begin(),knownFields.end(),key) == knownFields.end() )
         {
             cerr << "*** FATAL CONFIG FILE ERROR ***" << endl;
-            cerr << "error at line " << curline << ": unknow \"" << key  << "\"" << endl;
+            cerr << "error at line " << curline << ": unknown \"" << key  << "\"" << endl;
             exit(1);
         }
         if(key == "daemon" )
         {
             if(value != "yes" && value != "no"){
                 cerr << "*** FATAL CONFIG FILE ERROR ***" << endl;
-                cerr << "error at line " << curline << ": unknow \"" << value <<"\"" << endl;
+                cerr << "error at line " << curline << ": unknow \"" << value << "\"" << endl;
                 exit(1);
             }
         }
@@ -154,10 +156,10 @@ map<string,string> readConfig(const char* filename)
         curLine++;
 
         getline(fs,line,'\n');
+        line.erase(line.end()-1);
         removeSpace(line);
         if(line[0] == '#' || line[0] == '\n')
             continue;
-
         pair<string,vector<string> > kv = splitArgs(line);
         if(isValid(kv,curLine,line))
         {
@@ -168,5 +170,27 @@ map<string,string> readConfig(const char* filename)
     return ret;
 }
 
+int toByte(string str)
+{
+    string unit;
+    string number;
+    for (auto &c : str) {
+        if(c <= '9' && c >= '0'){
+            number.append(1,c);
+        } else if(c <= 'Z' && c >= 'A'){
+            unit.append(1,c);
+        }
+    }
+    if(unit == "B"){
+        return std::stoi(number);
+    } else if(unit == "KB"){
+        return std::stoi(number)*1024;
+    } else if(unit == "MB"){
+        return std::stoi(number)*1024*1024;
+    } else if(unit == "GB"){
+        return std::stoi(number)*1024*1024*1024;
+    }
+    return 0;
+}
 
 #endif

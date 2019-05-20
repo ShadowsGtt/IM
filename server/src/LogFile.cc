@@ -104,8 +104,9 @@ bool LogFile::rollFile()
 {
   time_t now = 0;
   /* 生成新文件名字 并将时间存入now中 */
-  string filename = getLogFileName(basename_, &now);
-  
+  string filename1 = getLogFileName(basename_, &now);
+  string filename = "../log/";
+  filename += filename1;
   /* start为now所指的当天的00:00 */
   time_t start = now / kRollPerSeconds_ * kRollPerSeconds_;
 

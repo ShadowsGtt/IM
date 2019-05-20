@@ -4,23 +4,32 @@
 
 using namespace std;
 
-Server::Server() : //addr_("0.0.0.0",9999) , server_(&loop_,addr_,"IM Server"),
-		dispatcher_(std::bind(&Server::onUnknownMessage, this, _1, _2, _3)),
-		codec_(std::bind(&ProtobufDispatcher::onProtobufMessage, &dispatcher_, _1, _2, _3))
+
+AsyncLogging* Server::log_ = NULL;
+
+void logOutput(const char *msg, int len)
 {
+    Server::log_->append(msg,len);
+}
+
+
+Server::Server() : dispatcher_(std::bind(&Server::onUnknownMessage, this, _1, _2, _3)),
+                   codec_(std::bind(&ProtobufDispatcher::onProtobufMessage, &dispatcher_, _1, _2, _3))
+{
+    //读取配置文件
     configMap_ = readConfig("../conf/server.conf");
+
+    //创建异步日志系统
+    log_ = new AsyncLogging("im",toByte(configMap_["logRollSie"]),std::stoi(configMap_["logFlushInterval"]));
+    // 设置日志输出
+    Logger::setOutput(logOutput);
+    LOG_INFO << "config read finished" ;
 
     loop_ = new EventLoop();
     addr_.setIpPort(configMap_["host"], std::stoi(configMap_["port"]));
     server_ = new TcpServer(loop_,addr_,configMap_["serverName"]);
 
     server_->setThreadNum(std::stoi(configMap_["ioThreadNumber"]));
-
-
-//    addr_.setIpPort("0.0.0.0", 9999);
-//    server_ = new TcpServer(loop_,addr_,"serverName");
-//
-//    server_->setThreadNum(5);
 
     /* 根据消息类型注册该类型消息回调 */
 	dispatcher_.registerMessageCallback<IM::Login>(
@@ -42,11 +51,12 @@ Server::Server() : //addr_("0.0.0.0",9999) , server_(&loop_,addr_,"IM Server"),
 }
 void Server::start()
 {
-	server_->start();
+    // 启动异步日志系统
+    log_->start();
+    server_->start();
+    LOG_INFO << "server start running";
 	loop_->loop();
 }
-
-
 
 void Server::onConnection(const TcpConnectionPtr& conn)
 {
